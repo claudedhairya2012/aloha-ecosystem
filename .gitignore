@@ -1,0 +1,18 @@
+Python
+pycache/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+Key files / Passports
+*.json
+!aloha.json
+IDE
+.vscode/
+.idea/
+
+OS
+.DS_Store
+Thumbs.db
