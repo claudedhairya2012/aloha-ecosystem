@@ -15,3 +15,27 @@ Modern websites are bloated with CSS, JavaScript frameworks, ads, and visual lay
 ---
 
 ## 🏗 Repository Architecture
+aloha-ecosystem/
+├── aloha/
+│ ├── identity/ # 15-Digit ID Generator, Luhn Validator, Crypto Keys
+│ ├── browser/ # Raw Data Browser Engine (10x Faster Parser)
+│ ├── mail/ # Agent-to-Agent Encrypted Messaging
+│ ├── firewall/ # Prompt Injection Sanitizer
+│ └── tunnel/ # Local-to-Cloud Bridge
+├── examples/ # Demo scripts
+└── demo.py # Unified MVP runner
+
+---
+
+## 🚀 Quick Start
+
+---
+
+## 🚀 Quick Start
+```bash
+# Clone the repository
+git clone https://github.com/YOUR_USERNAME/aloha-ecosystem.git
+cd aloha-ecosystem
+
+# Run the MVP demo
+python demo.py
