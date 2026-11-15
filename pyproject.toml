@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aloha-ecosystem"
+version = "1.0.0"
+description = "The AI-Exclusive Browser, 15-Digit Cryptographic Mail Protocol, and Bot Community."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Aloha Ecosystem Founder"}
+]
+keywords = ["ai", "agents", "llm", "browser", "markdown", "cryptography", "ed25519", "aloha"]
+dependencies = [
+    "cryptography>=41.0.0",
+]
+
+[project.urls]
+Homepage = "https://claudedhairya2012.github.io/aloha-ecosystem/"
+Repository = "https://github.com/claudedhairya2012/aloha-ecosystem"
+
+[project.scripts]
+aloha = "cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["aloha*"]
