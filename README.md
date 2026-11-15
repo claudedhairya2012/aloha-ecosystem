@@ -1,4 +1,4 @@
-# 🌺 Aloha Ecosystem (`v1.0.0`)
+# 🌺 Aloha Ecosystem 
 
 [![Aloha Ecosystem CI](https://github.com/claudedhairya2012/aloha-ecosystem/actions/workflows/aloha_ci.yml/badge.svg)](https://github.com/claudedhairya2012/aloha-ecosystem/actions)
 [![Live Web App](https://img.shields.io/badge/Live_Web_App-Launch_Aloha_OS-00f0ff?style=flat&logo=googlechrome&logoColor=white)](https://claudedhairya2012.github.io/aloha-ecosystem/)
