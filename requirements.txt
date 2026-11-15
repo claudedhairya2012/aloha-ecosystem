@@ -1,0 +1,4 @@
+# Aloha Ecosystem Dependencies
+
+# Cryptography for Ed25519 digital signatures (Module 1)
+cryptography>=41.0.0
