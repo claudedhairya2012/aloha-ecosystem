@@ -131,3 +131,5 @@ class AlohaHTMLParser:
                 "reduction_percent": reduction,
                 "estimated_tokens": max(10, len(markdown_body) // 4),
                 "numbers_preserved_pct": min(100.0, number_preservation_pct)
+            }
+        }
