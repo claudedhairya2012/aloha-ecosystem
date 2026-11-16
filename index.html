@@ -233,13 +233,8 @@
       font-size: 3.5rem;
       font-weight: 800;
       letter-spacing: -2px;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-    .google-sub {
-      color: var(--muted);
-      font-size: 0.92rem;
       margin-bottom: 32px;
+      color: var(--text);
     }
     .center-search-box {
       width: 100%;
@@ -266,36 +261,6 @@
       color: var(--text);
       font-size: 1.02rem;
       outline: none;
-    }
-
-    /* 6 CLICKABLE INDEX BADGES (FROM YOUR SCREENSHOT) */
-    .index-pills {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 24px;
-      max-width: 760px;
-    }
-    .index-badge {
-      font-size: 0.78rem;
-      font-family: var(--mono);
-      color: var(--text);
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      padding: 8px 14px;
-      border-radius: 9px;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .index-badge:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15);
     }
 
     /* MULTI-ENGINE SEARCH RESULTS VIEW */
@@ -573,14 +538,13 @@
     <button class="nav-icon-btn" onclick="reloadCurrentTab()" title="Refresh">↻</button>
     <button class="nav-icon-btn" onclick="goHomeClean()" title="New Search Home">🏠</button>
 
-    <!-- UNIFIED OMNIBAR (EMPTY BY DEFAULT) -->
+    <!-- UNIFIED OMNIBAR -->
     <div class="omnibar-wrap">
-      <span style="color:var(--muted); font-size:0.85rem;">🔒</span>
       <input
         type="text"
         id="omnibarInput"
         class="omnibar-input"
-        placeholder="Search 6 live indexes or type any URL..."
+        placeholder="Search or enter web address"
         onkeydown="if(event.key==='Enter') handleOmnibarSubmit(this.value)"
       />
     </div>
@@ -771,7 +735,6 @@
       document.getElementById("omnibarInput").value = getCurrentState().query || "";
     }
 
-    // CLICKABLE INDEX CHIPS (EXACT MATCH FOR YOUR SCREENSHOT)
     function triggerIndexChip(queryText, filterCategory = "ALL") {
       document.getElementById("omnibarInput").value = queryText;
       pushTabState({
@@ -790,27 +753,16 @@
         vp.innerHTML = `
           <div class="newtab-view">
             <div class="google-logo">Aloha</div>
-            <div class="google-sub">The AI-Native Browser & Multi-Index Factual Data Extractor</div>
             <div class="center-search-box">
               <span style="color:var(--muted);">🔍</span>
               <input
                 type="text"
                 id="centerSearchInput"
                 class="center-search-input"
-                placeholder="Search any topic across 6 indexes or enter a website URL..."
+                placeholder="Search or enter web address"
                 autofocus
                 onkeydown="if(event.key==='Enter') handleOmnibarSubmit(this.value)"
               />
-            </div>
-
-            <!-- CLICKABLE INDEX CHIPS FROM YOUR SCREENSHOT -->
-            <div class="index-pills">
-              <span class="index-badge" onclick="triggerIndexChip('Wikipedia Encyclopedia', 'ENCYCLOPEDIA')">🌐 Wikipedia (6.8M)</span>
-              <span class="index-badge" onclick="triggerIndexChip('Quantum Computing', 'SCIENCE')">🔬 OpenAlex Science (250M Papers)</span>
-              <span class="index-badge" onclick="triggerIndexChip('LLM Agent Orchestrator', 'CODE')">💻 GitHub Repositories</span>
-              <span class="index-badge" onclick="triggerIndexChip('Artificial Intelligence', 'WEB')">📰 HackerNews Index</span>
-              <span class="index-badge" onclick="triggerIndexChip('Machine Learning', 'ENCYCLOPEDIA')">🦆 DuckDuckGo Graph</span>
-              <span class="index-badge" onclick="triggerIndexChip('gpu-cluster.aloha', 'ALOHA')">🤖 .aloha Bot Network</span>
             </div>
           </div>
         `;
@@ -880,7 +832,7 @@
       vp.innerHTML = `
         <div class="search-results-container">
           <div style="color:var(--muted); font-family:var(--mono); font-size:0.82rem;">
-            Querying 6 live indexes for "${escapeHtml(query)}"...
+            Querying indexes for "${escapeHtml(query)}"...
           </div>
         </div>
       `;
