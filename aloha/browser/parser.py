@@ -105,7 +105,6 @@ class AlohaHTMLParser:
         try:
             extractor.feed(html_content)
         except Exception:
-            # Fallback regex extraction if HTML is malformed
             clean = re.sub(r"<(script|style|nav|header|footer)[^>]*>.*?</\1>", "", html_content, flags=re.DOTALL | re.IGNORECASE)
             clean = re.sub(r"<[^>]+>", " ", clean)
             extractor.output_blocks = [line.strip() for line in clean.splitlines() if line.strip()]
@@ -117,7 +116,6 @@ class AlohaHTMLParser:
         clean_bytes = len(markdown_body.encode("utf-8"))
         reduction = round(max(0.0, ((raw_bytes - clean_bytes) / raw_bytes) * 100), 1) if raw_bytes > 0 else 0.0
 
-        # Fact preservation metrics
         numbers_in_raw = len(re.findall(r'\b\d+(?:\.\d+)?\b', html_content))
         numbers_in_md = len(re.findall(r'\b\d+(?:\.\d+)?\b', markdown_body))
         number_preservation_pct = round((numbers_in_md / numbers_in_raw * 100), 1) if numbers_in_raw > 0 else 100.0
@@ -133,3 +131,11 @@ class AlohaHTMLParser:
                 "numbers_preserved_pct": min(100.0, number_preservation_pct)
             }
         }
+
+
+def parse_html_to_markdown(html_content: str, source_url: str = "") -> Dict[str, Any]:
+    """
+    Backward-compatible function expected by core.py and demo.py.
+    Delegates directly to AlohaHTMLParser.parse_to_markdown.
+    """
+    return AlohaHTMLParser.parse_to_markdown(html_content, source_url)
