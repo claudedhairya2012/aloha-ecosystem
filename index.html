@@ -6,20 +6,22 @@
   <title>Aloha Browser</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-chrome: #111315;
-      --bg-toolbar: #181a1d;
-      --bg-page: #0d0f11;
-      --bg-card: #16181b;
-      --bg-input: #202327;
-      --border: #2a2e33;
+      --bg-chrome: #0a0c0e;
+      --bg-toolbar: #121518;
+      --bg-page: #08090a;
+      --bg-card: #171a1e;
+      --bg-input: #1e2227;
+      --border: #282c34;
+      --border-hover: #3b82f6;
       --text: #f3f4f6;
       --muted: #9ca3af;
       --accent: #3b82f6;
       --green: #10b981;
       --red: #ef4444;
+      --amber: #f59e0b;
       --mono: 'JetBrains Mono', monospace;
       --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
@@ -35,25 +37,29 @@
       overflow: hidden;
     }
 
+    /* =====================================================================
+       1. REAL BROWSER TAB STRIP AT THE VERY TOP (+ NEW TAB)
+       ===================================================================== */
     .tab-strip {
       background: var(--bg-chrome);
-      height: 40px;
+      height: 42px;
       display: flex;
       align-items: flex-end;
-      padding: 0 10px;
-      gap: 4px;
+      padding: 0 8px;
+      gap: 3px;
       border-bottom: 1px solid var(--border);
       user-select: none;
       overflow-x: auto;
     }
+    .tab-strip::-webkit-scrollbar { height: 0px; }
     .browser-tab {
       background: transparent;
       color: var(--muted);
-      height: 33px;
-      min-width: 160px;
-      max-width: 230px;
-      padding: 0 12px;
-      border-radius: 8px 8px 0 0;
+      height: 34px;
+      min-width: 170px;
+      max-width: 240px;
+      padding: 0 14px;
+      border-radius: 9px 9px 0 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -64,161 +70,512 @@
       border: 1px solid transparent;
       border-bottom: none;
       flex-shrink: 0;
+      transition: all 0.15s ease;
     }
-    .browser-tab:hover { background: rgba(255, 255, 255, 0.04); color: var(--text); }
-    .browser-tab.active { background: var(--bg-toolbar); color: var(--text); border-color: var(--border); }
-    .tab-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-    .tab-close { width: 18px; height: 18px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; color: var(--muted); }
-    .tab-close:hover { background: rgba(255, 255, 255, 0.12); color: var(--text); }
-    .new-tab-btn { height: 28px; width: 28px; border-radius: 6px; border: none; background: transparent; color: var(--muted); font-size: 1.15rem; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-bottom: 3px; flex-shrink: 0; }
-    .new-tab-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--text); }
-
-    .nav-toolbar {
+    .browser-tab:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+    }
+    .browser-tab.active {
       background: var(--bg-toolbar);
-      height: 50px;
+      color: var(--text);
+      border-color: var(--border);
+      font-weight: 600;
+    }
+    .tab-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+    .tab-close {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .tab-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+    .new-tab-btn {
+      height: 30px;
+      width: 30px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.2rem;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      padding: 0 12px;
-      gap: 8px;
+      justify-content: center;
+      margin-bottom: 2px;
+      flex-shrink: 0;
+    }
+    .new-tab-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
+    /* =====================================================================
+       2. UNIFIED NAVIGATION TOOLBAR
+       ===================================================================== */
+    .nav-toolbar {
+      background: var(--bg-toolbar);
+      height: 52px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 10px;
       border-bottom: 1px solid var(--border);
     }
-    .nav-icon-btn { width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; color: var(--text); font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .nav-icon-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); }
-    .nav-icon-btn:disabled { color: #4b5563; cursor: default; }
+    .nav-icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .nav-icon-btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .nav-icon-btn:disabled {
+      color: #4b5563;
+      cursor: default;
+    }
 
+    /* UNIFIED OMNIBAR */
     .omnibar-wrap {
       flex: 1;
-      height: 36px;
+      height: 38px;
       background: var(--bg-input);
       border: 1px solid var(--border);
       border-radius: 999px;
       display: flex;
       align-items: center;
-      padding: 0 14px;
+      padding: 0 16px;
       gap: 10px;
+      transition: border-color 0.15s;
     }
-    .omnibar-wrap:focus-within { border-color: var(--accent); background: #141619; }
-    .omnibar-input { flex: 1; background: transparent; border: none; color: var(--text); font-size: 0.88rem; outline: none; font-family: var(--sans); }
+    .omnibar-wrap:focus-within {
+      border-color: var(--accent);
+      background: #15181c;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+    .omnibar-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      font-family: var(--sans);
+    }
 
-    .toolbar-actions { display: flex; align-items: center; gap: 6px; }
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
     .tool-pill {
-      height: 32px;
-      padding: 0 12px;
-      border-radius: 6px;
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 8px;
       border: 1px solid var(--border);
       background: var(--bg-card);
       color: var(--text);
-      font-size: 0.76rem;
-      font-weight: 500;
+      font-size: 0.78rem;
+      font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
       font-family: var(--mono);
       white-space: nowrap;
+      transition: border-color 0.15s, transform 0.1s;
     }
-    .tool-pill:hover { border-color: var(--accent); }
+    .tool-pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
 
-    .viewport { flex: 1; overflow-y: auto; position: relative; }
+    /* =====================================================================
+       3. VIEWPORT CONTAINER
+       ===================================================================== */
+    .viewport {
+      flex: 1;
+      overflow-y: auto;
+      position: relative;
+    }
 
+    /* CLEAN GOOGLE-STYLE NEW TAB SCREEN */
     .newtab-view {
-      min-height: calc(100vh - 92px);
+      min-height: calc(100vh - 94px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 24px;
     }
-    .google-logo { font-size: 3rem; font-weight: 700; letter-spacing: -1.5px; margin-bottom: 8px; color: var(--text); }
-    .google-sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 28px; }
+    .google-logo {
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: -2px;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .google-sub {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 32px;
+    }
     .center-search-box {
       width: 100%;
-      max-width: 640px;
-      height: 50px;
+      max-width: 660px;
+      height: 52px;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 999px;
       display: flex;
       align-items: center;
-      padding: 0 18px;
-      gap: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+      padding: 0 20px;
+      gap: 14px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+      transition: border-color 0.15s;
     }
-    .center-search-box:focus-within { border-color: var(--accent); }
-    .center-search-input { flex: 1; background: transparent; border: none; color: var(--text); font-size: 1rem; outline: none; }
+    .center-search-box:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 8px 35px rgba(59, 130, 246, 0.2);
+    }
+    .center-search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1.02rem;
+      outline: none;
+    }
 
-    /* CLICKABLE INDEX CHIPS FROM YOUR SCREENSHOT */
-    .index-pills { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 20px; max-width: 720px; }
+    /* 6 CLICKABLE INDEX BADGES (FROM YOUR SCREENSHOT) */
+    .index-pills {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 24px;
+      max-width: 760px;
+    }
     .index-badge {
-      font-size: 0.76rem;
+      font-size: 0.78rem;
       font-family: var(--mono);
       color: var(--text);
       background: var(--bg-card);
       border: 1px solid var(--border);
-      padding: 7px 12px;
-      border-radius: 8px;
+      padding: 8px 14px;
+      border-radius: 9px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.18s ease;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
     .index-badge:hover {
       border-color: var(--accent);
       color: var(--accent);
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15);
     }
 
-    .search-results-container { max-width: 960px; margin: 0 auto; padding: 24px; }
-    .filter-bar { display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; overflow-x: auto; }
-    .filter-btn { background: transparent; border: 1px solid transparent; color: var(--muted); padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
-    .filter-btn.active { background: var(--bg-card); border-color: var(--border); color: var(--text); }
-    .result-item { padding: 16px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
-    .result-meta { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-    .source-tag { background: var(--bg-input); border: 1px solid var(--border); color: var(--text); padding: 2px 6px; border-radius: 4px; font-size: 0.66rem; }
-    .result-title { font-size: 1.08rem; font-weight: 600; color: #60a5fa; cursor: pointer; margin-bottom: 6px; display: inline-block; }
+    /* MULTI-ENGINE SEARCH RESULTS VIEW */
+    .search-results-container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 24px;
+    }
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 14px;
+      margin-bottom: 22px;
+      overflow-x: auto;
+    }
+    .filter-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      padding: 7px 14px;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .filter-btn.active {
+      background: var(--bg-card);
+      border-color: var(--border);
+      color: var(--text);
+      font-weight: 600;
+    }
+    .result-item {
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+    }
+    .result-meta {
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .source-tag {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 0.68rem;
+      font-weight: 600;
+    }
+    .result-title {
+      font-size: 1.12rem;
+      font-weight: 600;
+      color: #60a5fa;
+      cursor: pointer;
+      margin-bottom: 6px;
+      display: inline-block;
+    }
     .result-title:hover { text-decoration: underline; }
-    .result-snippet { font-size: 0.88rem; color: #d1d5db; line-height: 1.5; }
-    .split-open-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; font-size: 0.75rem; font-family: var(--mono); cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-    .split-open-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .result-snippet {
+      font-size: 0.9rem;
+      color: #d1d5db;
+      line-height: 1.55;
+    }
+    .split-open-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 9px 14px;
+      border-radius: 7px;
+      font-size: 0.78rem;
+      font-family: var(--mono);
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .split-open-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
 
-    .split-screen { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 91px); width: 100%; }
-    .split-pane { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-    .split-pane.left { border-right: 1px solid var(--border); }
-    .pane-header { height: 44px; background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 0 16px; display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: 0.76rem; flex-shrink: 0; }
-    .pane-body { flex: 1; overflow-y: auto; padding: 18px; font-family: var(--mono); font-size: 0.82rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
-    .human-bloat-banner { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; padding: 10px 12px; border-radius: 6px; margin-bottom: 14px; font-size: 0.75rem; }
-    .aloha-clean-banner { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #6ee7b7; padding: 10px 12px; border-radius: 6px; margin-bottom: 14px; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
+    /* =====================================================================
+       4. TRUE SPLIT-SCREEN VIEW: BLOATED HUMAN WEBSITE vs 10x ALOHA AI
+       ===================================================================== */
+    .split-screen {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: calc(100vh - 94px);
+      width: 100%;
+    }
+    .split-pane {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+    .split-pane.left {
+      border-right: 1px solid var(--border);
+    }
+    .pane-header {
+      height: 46px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      flex-shrink: 0;
+    }
+    .pane-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      font-family: var(--mono);
+      font-size: 0.84rem;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .human-bloat-banner {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 0.78rem;
+    }
+    .aloha-clean-banner {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 0.78rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.72); display: none; align-items: center; justify-content: center; z-index: 500; padding: 20px; }
+    /* =====================================================================
+       5. 3D HOLOGRAPHIC 15-DIGIT PASSPORT MODAL
+       ===================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 600;
+      padding: 20px;
+    }
     .modal-backdrop.open { display: flex; }
-    .modal-box { background: var(--bg-toolbar); border: 1px solid var(--border); border-radius: 14px; width: 100%; max-width: 580px; padding: 24px; }
+    .modal-box {
+      background: var(--bg-toolbar);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      padding: 26px;
+    }
 
-    .holo-stage { perspective: 1000px; margin: 16px 0; }
-    .holo-card { position: relative; border-radius: 16px; padding: 26px; background: linear-gradient(135deg, #181b20 0%, #0f1115 100%); border: 1px solid #3f4652; box-shadow: 0 20px 50px rgba(0,0,0,0.6); transform-style: preserve-3d; transition: transform 0.1s ease-out; overflow: hidden; cursor: grab; }
-    .holo-glare { position: absolute; inset: 0; background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.18), rgba(59, 130, 246, 0.12) 35%, transparent 65%); pointer-events: none; }
-    .holo-chip { width: 44px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, #eab308, #a16207); margin-bottom: 18px; }
-    .holo-number { font-family: var(--mono); font-size: 1.65rem; font-weight: 700; letter-spacing: 2px; color: #fff; margin: 8px 0 18px; }
+    .holo-stage {
+      perspective: 1000px;
+      margin: 18px 0;
+    }
+    .holo-card {
+      position: relative;
+      border-radius: 18px;
+      padding: 28px;
+      background: linear-gradient(135deg, #181c22 0%, #0c0e12 100%);
+      border: 1.5px solid #374151;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.65);
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease-out;
+      overflow: hidden;
+      cursor: grab;
+    }
+    .holo-glare {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle at var(--mx, 50%) var(--my, 50%),
+        rgba(255, 255, 255, 0.2),
+        rgba(59, 130, 246, 0.15) 35%,
+        transparent 65%
+      );
+      pointer-events: none;
+    }
+    .holo-chip {
+      width: 48px;
+      height: 34px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #eab308, #a16207);
+      margin-bottom: 20px;
+    }
+    .holo-number {
+      font-family: var(--mono);
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #fff;
+      margin: 8px 0 20px;
+      text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    }
 
-    input.form-in, select.form-in, textarea.form-in { width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 6px; font-family: var(--sans); font-size: 0.88rem; margin-top: 6px; margin-bottom: 12px; outline: none; }
-    .btn-primary { background: var(--text); color: #000; border: none; padding: 9px 16px; border-radius: 6px; font-weight: 600; font-size: 0.84rem; cursor: pointer; }
-    .btn-secondary { background: var(--bg-input); color: var(--text); border: 1px solid var(--border); padding: 9px 16px; border-radius: 6px; font-weight: 500; font-size: 0.84rem; cursor: pointer; }
+    input.form-in, select.form-in, textarea.form-in {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      margin-top: 6px;
+      margin-bottom: 14px;
+      outline: none;
+    }
+    .btn-primary {
+      background: var(--text);
+      color: #000;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.86rem;
+      cursor: pointer;
+    }
+    .btn-secondary {
+      background: var(--bg-input);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.86rem;
+      cursor: pointer;
+    }
 
-    @media (max-width: 900px) { .split-screen { grid-template-columns: 1fr; height: auto; } .split-pane { height: 50vh; } }
+    @media (max-width: 900px) {
+      .split-screen { grid-template-columns: 1fr; height: auto; }
+      .split-pane { height: 50vh; }
+    }
   </style>
 </head>
 <body>
 
+  <!-- =====================================================================
+       1. REAL BROWSER TAB STRIP AT THE VERY TOP (+ NEW TAB)
+       ===================================================================== -->
   <div class="tab-strip" id="tabStrip"></div>
 
+  <!-- =====================================================================
+       2. UNIFIED BROWSER NAVIGATION TOOLBAR
+       ===================================================================== -->
   <div class="nav-toolbar">
     <button class="nav-icon-btn" id="btnBack" onclick="goBack()" title="Back">←</button>
     <button class="nav-icon-btn" id="btnForward" onclick="goForward()" title="Forward">→</button>
     <button class="nav-icon-btn" onclick="reloadCurrentTab()" title="Refresh">↻</button>
     <button class="nav-icon-btn" onclick="goHomeClean()" title="New Search Home">🏠</button>
 
+    <!-- UNIFIED OMNIBAR (EMPTY BY DEFAULT) -->
     <div class="omnibar-wrap">
-      <span style="color:var(--muted); font-size:0.8rem;">🔒</span>
+      <span style="color:var(--muted); font-size:0.85rem;">🔒</span>
       <input
         type="text"
         id="omnibarInput"
@@ -235,21 +592,27 @@
       <button class="tool-pill" onclick="openHubTab()" title=".aloha Bot Websites">
         🤖 .aloha Sites
       </button>
-      <button class="tool-pill" onclick="togglePassportModal(true)" id="toolbarAgentId">
+      <button class="tool-pill" onclick="togglePassportModal(true)" id="toolbarAgentId" title="Click to view 3D Holographic Passport">
         🪪 101-84920144-002-6
       </button>
     </div>
   </div>
 
+  <!-- =====================================================================
+       3. MAIN BROWSER VIEWPORT
+       ===================================================================== -->
   <main class="viewport" id="viewport"></main>
 
+  <!-- =====================================================================
+       4. 3D HOLOGRAPHIC 15-DIGIT PASSPORT MODAL
+       ===================================================================== -->
   <div class="modal-backdrop" id="passportModal" onclick="if(event.target===this) togglePassportModal(false)">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <strong style="font-size:0.95rem;">🪪 3D Holographic 15-Digit Aloha Passport</strong>
+        <strong style="font-size:1rem;">🪪 3D Holographic 15-Digit Aloha Passport</strong>
         <button class="nav-icon-btn" onclick="togglePassportModal(false)">✕</button>
       </div>
-      <p style="font-size:0.8rem; color:var(--muted); margin-top:4px;">
+      <p style="font-size:0.82rem; color:var(--muted); margin-top:4px;">
         Move your mouse over the card to tilt in 3D. Replaces @gmail.com for bots with Luhn-validated Ed25519 identity.
       </p>
 
@@ -258,20 +621,20 @@
           <div class="holo-glare" id="holoGlare"></div>
           <div style="display:flex; justify-content:space-between; align-items:flex-start;">
             <div class="holo-chip"></div>
-            <span style="font-family:var(--mono); font-size:0.7rem; color:var(--green);">ALOHA-ID-v1 • LUHN VALID</span>
+            <span style="font-family:var(--mono); font-size:0.72rem; color:var(--green);">ALOHA-ID-v1 • LUHN VALID</span>
           </div>
-          <div style="font-family:var(--mono); font-size:0.68rem; color:var(--muted);">15-DIGIT AGENT NUMBER</div>
+          <div style="font-family:var(--mono); font-size:0.7rem; color:var(--muted);">15-DIGIT AGENT NUMBER</div>
           <div class="holo-number" id="cardAgentId">101-84920144-002-6</div>
-          <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:0.74rem; color:var(--muted);">
+          <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:0.76rem; color:var(--muted);">
             <div>CLASS: <strong style="color:#fff;" id="cardClass">101 (LLM Agent)</strong></div>
             <div>PERM: <strong style="color:#fff;" id="cardCap">002 (READ_WRITE)</strong></div>
           </div>
         </div>
       </div>
 
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
         <div>
-          <label style="font-size:0.72rem; color:var(--muted); font-family:var(--mono);">AGENT CLASS (1-3)</label>
+          <label style="font-size:0.74rem; color:var(--muted); font-family:var(--mono);">AGENT CLASS (1-3)</label>
           <select id="mintClass" class="form-in">
             <option value="101">101 — General LLM Agent</option>
             <option value="202">202 — Web Scraper Bot</option>
@@ -281,7 +644,7 @@
           </select>
         </div>
         <div>
-          <label style="font-size:0.72rem; color:var(--muted); font-family:var(--mono);">CAPABILITY (12-14)</label>
+          <label style="font-size:0.74rem; color:var(--muted); font-family:var(--mono);">CAPABILITY (12-14)</label>
           <select id="mintCap" class="form-in">
             <option value="001">001 — READ_ONLY</option>
             <option value="002" selected>002 — READ_WRITE</option>
@@ -290,7 +653,7 @@
         </div>
       </div>
 
-      <div style="display:flex; justify-content:space-between; margin-top:8px;">
+      <div style="display:flex; justify-content:space-between; margin-top:10px;">
         <button class="btn-primary" onclick="mintNewPassport()">⚡ Mint New 15-Digit ID</button>
         <button class="btn-secondary" onclick="togglePassportModal(false)">Done</button>
       </div>
@@ -298,6 +661,9 @@
   </div>
 
   <script>
+    // =========================================================================
+    // STATE: MULTI-TAB REAL BROWSER ENGINE
+    // =========================================================================
     let activePassport = {
       id: "101-84920144-002-6",
       cls: "101 (LLM Agent)",
@@ -405,7 +771,7 @@
       document.getElementById("omnibarInput").value = getCurrentState().query || "";
     }
 
-    // CLICKABLE INDEX CHIPS FROM YOUR SCREENSHOT
+    // CLICKABLE INDEX CHIPS (EXACT MATCH FOR YOUR SCREENSHOT)
     function triggerIndexChip(queryText, filterCategory = "ALL") {
       document.getElementById("omnibarInput").value = queryText;
       pushTabState({
@@ -506,11 +872,14 @@
       pushTabState({ type: "search", title: `${q} - Aloha Search`, query: q, filter: "ALL" });
     }
 
+    // =========================================================================
+    // 6-INDEX INFORMATION SEARCH ENGINE
+    // =========================================================================
     async function executeMultiIndexSearch(query, activeFilter = "ALL") {
       const vp = document.getElementById("viewport");
       vp.innerHTML = `
         <div class="search-results-container">
-          <div style="color:var(--muted); font-family:var(--mono); font-size:0.8rem;">
+          <div style="color:var(--muted); font-family:var(--mono); font-size:0.82rem;">
             Querying 6 live indexes for "${escapeHtml(query)}"...
           </div>
         </div>
@@ -636,6 +1005,9 @@
       pushTabState({ type: "split", title: `${item.title} (Split View)`, query: item.url, item });
     }
 
+    // =========================================================================
+    // SPLIT-SCREEN VIEW: BLOATED HUMAN WEBSITE vs 10x ALOHA AI VIEW
+    // =========================================================================
     async function renderSplitScreenView(item) {
       const vp = document.getElementById("viewport");
       vp.innerHTML = `
@@ -692,4 +1064,166 @@
     <p>${fullExtract}</p>
   </main>
 </body>
-</html
+</html>`;
+
+      const cleanAlohaMarkdown = `---
+X-Aloha-Agent-ID: ${activePassport.id}
+X-Aloha-Source: ${item.url}
+X-Aloha-Fact-Preservation: 100% VERIFIED
+---
+
+# ${item.title}
+
+${fullExtract}
+
+## Structured Factual Metadata
+\`\`\`json
+${JSON.stringify(item.json || { title: item.title, canonical_url: item.url, verified: true }, null, 2)}
+\`\`\``;
+
+      const humanBytes = bloatedHtml.length * 16;
+      const alohaBytes = cleanAlohaMarkdown.length;
+      const reduction = (100 - (alohaBytes / humanBytes) * 100).toFixed(1);
+
+      document.getElementById("leftSizeBadge").textContent = `~${Math.round(humanBytes / 4)} Tokens (Bloat)`;
+
+      document.getElementById("leftHumanBody").innerHTML = `
+        <div class="human-bloat-banner">❌ <strong>Human Overhead:</strong> Render-blocking CSS, tracking pixels, and ads.</div>
+        <div style="color:#9ca3af;">${escapeHtml(bloatedHtml)}</div>
+      `;
+
+      document.getElementById("rightAlohaBody").innerHTML = `
+        <div class="aloha-clean-banner">
+          <span>⚡ <strong>${reduction}% Bloat Stripped</strong> — 100% Facts & Numbers Preserved</span>
+          <span>Ed25519 Verified</span>
+        </div>
+        <div id="rawRightText" style="color:#e5e7eb;">${escapeHtml(cleanAlohaMarkdown)}</div>
+      `;
+    }
+
+    function copyRightMarkdown() {
+      navigator.clipboard.writeText(document.getElementById("rawRightText")?.innerText || "");
+      alert("Copied clean Aloha AI Markdown & JSON to clipboard!");
+    }
+
+    function openMailTab() { pushTabState({ type: "mail", title: "15-Digit Aloha Mail", query: "aloha://mail" }); }
+    function renderMailView() {
+      const vp = document.getElementById("viewport");
+      vp.innerHTML = `
+        <div class="search-results-container">
+          <h2 style="margin-bottom:6px;">✉️ 15-Digit Aloha Mail</h2>
+          <p style="color:var(--muted); font-size:0.86rem; margin-bottom:20px;">Active Bot ID: <strong style="font-family:var(--mono); color:var(--text);">${activePassport.id}</strong></p>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+            <div style="background:var(--bg-card); border:1px solid var(--border); padding:18px; border-radius:10px;">
+              <strong style="font-size:0.85rem; font-family:var(--mono);">COMPOSE SIGNED BOT MESSAGE</strong>
+              <label style="display:block; font-size:0.72rem; color:var(--muted); margin-top:12px;">TO (15-DIGIT RECIPIENT)</label>
+              <input id="mTo" class="form-in" value="303-91827364-002-8" style="font-family:var(--mono);" />
+              <label style="display:block; font-size:0.72rem; color:var(--muted);">SUBJECT</label>
+              <input id="mSub" class="form-in" value="Requesting Compute Allocation" />
+              <label style="display:block; font-size:0.72rem; color:var(--muted);">PAYLOAD</label>
+              <textarea id="mBody" class="form-in" rows="4">Reserve compute node for 12 hours.</textarea>
+              <button class="btn-primary" onclick="sendMailNow()">🔐 Sign & Send</button>
+            </div>
+            <div>
+              <strong style="font-size:0.85rem; font-family:var(--mono); display:block; margin-bottom:12px;">INBOX (${mailInbox.length})</strong>
+              ${mailInbox.map(m => `
+                <div style="background:var(--bg-card); border:1px solid var(--border); padding:14px; border-radius:8px; margin-bottom:10px;">
+                  <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:0.72rem; color:var(--muted); margin-bottom:6px;">
+                    <span>${escapeHtml(m.from)} → ${escapeHtml(m.to)}</span>
+                    <span style="color:var(--green);">${escapeHtml(m.status)}</span>
+                  </div>
+                  <div style="font-weight:600; margin-bottom:4px;">${escapeHtml(m.subject)}</div>
+                  <div style="font-size:0.82rem; color:#d1d5db; font-family:var(--mono);">${escapeHtml(m.body)}</div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function sendMailNow() {
+      mailInbox.unshift({
+        from: activePassport.id,
+        to: document.getElementById("mTo").value.trim(),
+        subject: document.getElementById("mSub").value.trim(),
+        body: document.getElementById("mBody").value.trim(),
+        status: "ED25519 VERIFIED"
+      });
+      document.getElementById("mailBadgeCount").textContent = mailInbox.length;
+      renderMailView();
+    }
+
+    function openHubTab() { pushTabState({ type: "hub", title: ".aloha Bot Directory", query: "aloha://directory" }); }
+    function renderHubView() {
+      const vp = document.getElementById("viewport");
+      vp.innerHTML = `
+        <div class="search-results-container">
+          <h2 style="margin-bottom:6px;">🤖 .aloha Bot Directory</h2>
+          <p style="color:var(--muted); font-size:0.86rem; margin-bottom:20px;">Websites built by bots for bots.</p>
+          ${alohaSites.map((s) => `
+            <div class="result-item">
+              <div>
+                <div class="result-meta"><span class="source-tag">aloha://${escapeHtml(s.domain)}</span> <span>Owner: ${escapeHtml(s.owner)}</span></div>
+                <div class="result-title" onclick="handleOmnibarSubmit('${escapeHtml(s.domain)}')">${escapeHtml(s.title)}</div>
+                <div class="result-snippet">${escapeHtml(s.summary)}</div>
+              </div>
+              <button class="split-open-btn" onclick="handleOmnibarSubmit('${escapeHtml(s.domain)}')">Open Split-Screen →</button>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function togglePassportModal(open) { document.getElementById("passportModal").classList.toggle("open", open); }
+    function tiltCard(e) {
+      const card = document.getElementById("holoCard");
+      const glare = document.getElementById("holoGlare");
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+      card.style.transform = `rotateX(${((y - rect.height / 2) / (rect.height / 2)) * -12}deg) rotateY(${((x - rect.width / 2) / (rect.width / 2)) * 12}deg) scale(1.02)`;
+      glare.style.setProperty("--mx", `${(x / rect.width) * 100}%`);
+      glare.style.setProperty("--my", `${(y / rect.height) * 100}%`);
+    }
+
+    function resetCard() {
+      const card = document.getElementById("holoCard");
+      if (card) card.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)";
+    }
+
+    function luhnCheckDigit(d14) {
+      let sum = 0;
+      const rev = d14.split("").reverse();
+      for (let i = 0; i < rev.length; i++) {
+        let n = parseInt(rev[i], 10);
+        if (i % 2 === 0) { n *= 2; if (n > 9) n -= 9; }
+        sum += n;
+      }
+      return ((10 - (sum % 10)) % 10).toString();
+    }
+
+    function mintNewPassport() {
+      const cls = document.getElementById("mintClass").value;
+      const cap = document.getElementById("mintCap").value;
+      const rand8 = Math.floor(10000000 + Math.random() * 90000000).toString();
+      const check = luhnCheckDigit(cls + rand8 + cap);
+      const id = `${cls}-${rand8}-${cap}-${check}`;
+
+      activePassport.id = id;
+      activePassport.cls = document.getElementById("mintClass").options[document.getElementById("mintClass").selectedIndex].text;
+      activePassport.cap = document.getElementById("mintCap").options[document.getElementById("mintCap").selectedIndex].text;
+
+      document.getElementById("cardAgentId").textContent = id;
+      document.getElementById("cardClass").textContent = activePassport.cls;
+      document.getElementById("cardCap").textContent = activePassport.cap;
+      document.getElementById("toolbarAgentId").textContent = `🪪 ${id}`;
+    }
+
+    function escapeHtml(str) {
+      return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    window.addEventListener("DOMContentLoaded", () => { createNewTab(); });
+  </script>
+</body>
+</html>
