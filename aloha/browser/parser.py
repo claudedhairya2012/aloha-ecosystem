@@ -123,6 +123,7 @@ class AlohaHTMLParser:
         return {
             "url": source_url,
             "markdown": markdown_body,
+            "raw_markdown": markdown_body,  # Added to support core.py and demo.py expectations
             "metrics": {
                 "raw_html_bytes": raw_bytes,
                 "clean_markdown_bytes": clean_bytes,
