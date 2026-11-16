@@ -16,6 +16,8 @@ class FactualContentExtractor(HTMLParser):
         self.stack: List[str] = []
         self.output_blocks: List[str] = []
         self.current_block: List[str] = []
+        self.page_title = ""
+        self.in_title = False
         self.in_discard = False
         self.in_table = False
         self.current_table_row: List[str] = []
@@ -26,6 +28,9 @@ class FactualContentExtractor(HTMLParser):
         self.stack.append(tag)
         if tag in self.DISCARD_TAGS:
             self.in_discard = True
+
+        if tag == "title":
+            self.in_title = True
 
         # Handle class/id noise filters (ads, cookies, navs)
         attr_dict = dict(attrs)
@@ -43,6 +48,9 @@ class FactualContentExtractor(HTMLParser):
         tag = tag.lower()
         if self.stack and self.stack[-1] == tag:
             self.stack.pop()
+
+        if tag == "title":
+            self.in_title = False
 
         if tag in self.DISCARD_TAGS:
             self.in_discard = False
@@ -74,7 +82,6 @@ class FactualContentExtractor(HTMLParser):
         if tag == "table":
             self.in_table = False
             if self.table_data:
-                # Format data table as Markdown
                 md_table = []
                 for idx, row in enumerate(self.table_data):
                     md_table.append("| " + " | ".join(row) + " |")
@@ -84,6 +91,9 @@ class FactualContentExtractor(HTMLParser):
                 self.table_data = []
 
     def handle_data(self, data: str):
+        if self.in_title:
+            self.page_title += data.strip() + " "
+            return
         if self.in_discard:
             return
         cleaned = data.strip()
@@ -120,10 +130,19 @@ class AlohaHTMLParser:
         numbers_in_md = len(re.findall(r'\b\d+(?:\.\d+)?\b', markdown_body))
         number_preservation_pct = round((numbers_in_md / numbers_in_raw * 100), 1) if numbers_in_raw > 0 else 100.0
 
+        title = extractor.page_title.strip() or source_url or "Untitled Page"
+
         return {
             "url": source_url,
             "markdown": markdown_body,
-            "raw_markdown": markdown_body,  # Added to support core.py and demo.py expectations
+            "raw_markdown": markdown_body,
+            "metadata": {
+                "title": title,
+                "url": source_url,
+                "raw_bytes": raw_bytes,
+                "clean_bytes": clean_bytes,
+                "reduction_percent": reduction
+            },
             "metrics": {
                 "raw_html_bytes": raw_bytes,
                 "clean_markdown_bytes": clean_bytes,
