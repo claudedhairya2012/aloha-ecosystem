@@ -35,9 +35,6 @@
       overflow: hidden;
     }
 
-    /* =====================================================================
-       1. REAL BROWSER TAB BAR (TOP STRIP)
-       ===================================================================== */
     .tab-strip {
       background: var(--bg-chrome);
       height: 40px;
@@ -68,58 +65,14 @@
       border-bottom: none;
       flex-shrink: 0;
     }
-    .browser-tab:hover {
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text);
-    }
-    .browser-tab.active {
-      background: var(--bg-toolbar);
-      color: var(--text);
-      border-color: var(--border);
-    }
-    .tab-title {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      flex: 1;
-    }
-    .tab-close {
-      width: 18px;
-      height: 18px;
-      border-radius: 4px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-    .tab-close:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: var(--text);
-    }
-    .new-tab-btn {
-      height: 28px;
-      width: 28px;
-      border-radius: 6px;
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      font-size: 1.15rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 3px;
-      flex-shrink: 0;
-    }
-    .new-tab-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text);
-    }
+    .browser-tab:hover { background: rgba(255, 255, 255, 0.04); color: var(--text); }
+    .browser-tab.active { background: var(--bg-toolbar); color: var(--text); border-color: var(--border); }
+    .tab-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+    .tab-close { width: 18px; height: 18px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; color: var(--muted); }
+    .tab-close:hover { background: rgba(255, 255, 255, 0.12); color: var(--text); }
+    .new-tab-btn { height: 28px; width: 28px; border-radius: 6px; border: none; background: transparent; color: var(--muted); font-size: 1.15rem; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-bottom: 3px; flex-shrink: 0; }
+    .new-tab-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--text); }
 
-    /* =====================================================================
-       2. BROWSER NAVIGATION BAR (BACK, FORWARD, REFRESH, OMNIBAR)
-       ===================================================================== */
     .nav-toolbar {
       background: var(--bg-toolbar);
       height: 50px;
@@ -129,28 +82,10 @@
       gap: 8px;
       border-bottom: 1px solid var(--border);
     }
-    .nav-icon-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      border: none;
-      background: transparent;
-      color: var(--text);
-      font-size: 0.95rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .nav-icon-btn:hover:not(:disabled) {
-      background: rgba(255, 255, 255, 0.08);
-    }
-    .nav-icon-btn:disabled {
-      color: #4b5563;
-      cursor: default;
-    }
+    .nav-icon-btn { width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; color: var(--text); font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .nav-icon-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); }
+    .nav-icon-btn:disabled { color: #4b5563; cursor: default; }
 
-    /* UNIFIED URL / SEARCH OMNIBAR */
     .omnibar-wrap {
       flex: 1;
       height: 36px;
@@ -162,25 +97,10 @@
       padding: 0 14px;
       gap: 10px;
     }
-    .omnibar-wrap:focus-within {
-      border-color: var(--accent);
-      background: #141619;
-    }
-    .omnibar-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 0.88rem;
-      outline: none;
-      font-family: var(--sans);
-    }
+    .omnibar-wrap:focus-within { border-color: var(--accent); background: #141619; }
+    .omnibar-input { flex: 1; background: transparent; border: none; color: var(--text); font-size: 0.88rem; outline: none; font-family: var(--sans); }
 
-    .toolbar-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .toolbar-actions { display: flex; align-items: center; gap: 6px; }
     .tool-pill {
       height: 32px;
       padding: 0 12px;
@@ -197,20 +117,10 @@
       font-family: var(--mono);
       white-space: nowrap;
     }
-    .tool-pill:hover {
-      border-color: var(--accent);
-    }
+    .tool-pill:hover { border-color: var(--accent); }
 
-    /* =====================================================================
-       3. MAIN VIEWPORT AREA
-       ===================================================================== */
-    .viewport {
-      flex: 1;
-      overflow-y: auto;
-      position: relative;
-    }
+    .viewport { flex: 1; overflow-y: auto; position: relative; }
 
-    /* STATE A: CLEAN GOOGLE-STYLE NEW TAB PAGE */
     .newtab-view {
       min-height: calc(100vh - 92px);
       display: flex;
@@ -219,18 +129,8 @@
       justify-content: center;
       padding: 24px;
     }
-    .google-logo {
-      font-size: 3rem;
-      font-weight: 700;
-      letter-spacing: -1.5px;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-    .google-sub {
-      color: var(--muted);
-      font-size: 0.88rem;
-      margin-bottom: 28px;
-    }
+    .google-logo { font-size: 3rem; font-weight: 700; letter-spacing: -1.5px; margin-bottom: 8px; color: var(--text); }
+    .google-sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 28px; }
     .center-search-box {
       width: 100%;
       max-width: 640px;
@@ -244,314 +144,86 @@
       gap: 12px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
     }
-    .center-search-box:focus-within {
-      border-color: var(--accent);
-    }
-    .center-search-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 1rem;
-      outline: none;
-    }
-    .index-pills {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 20px;
-      max-width: 680px;
-    }
-    .index-badge {
-      font-size: 0.72rem;
-      font-family: var(--mono);
-      color: var(--muted);
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      padding: 5px 10px;
-      border-radius: 6px;
-    }
+    .center-search-box:focus-within { border-color: var(--accent); }
+    .center-search-input { flex: 1; background: transparent; border: none; color: var(--text); font-size: 1rem; outline: none; }
 
-    /* STATE B: MULTI-INDEX SEARCH RESULTS VIEW */
-    .search-results-container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-    .filter-bar {
-      display: flex;
-      gap: 8px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 12px;
-      margin-bottom: 20px;
-      overflow-x: auto;
-    }
-    .filter-btn {
-      background: transparent;
-      border: 1px solid transparent;
-      color: var(--muted);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .filter-btn.active {
-      background: var(--bg-card);
-      border-color: var(--border);
-      color: var(--text);
-    }
-    .result-item {
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-    }
-    .result-meta {
+    /* CLICKABLE INDEX CHIPS FROM YOUR SCREENSHOT */
+    .index-pills { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 20px; max-width: 720px; }
+    .index-badge {
+      font-size: 0.76rem;
       font-family: var(--mono);
-      font-size: 0.72rem;
-      color: var(--muted);
-      margin-bottom: 4px;
-      display: flex;
+      color: var(--text);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
-    .source-tag {
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.66rem;
-    }
-    .result-title {
-      font-size: 1.08rem;
-      font-weight: 600;
-      color: #60a5fa;
-      cursor: pointer;
-      margin-bottom: 6px;
-      display: inline-block;
-    }
-    .result-title:hover { text-decoration: underline; }
-    .result-snippet {
-      font-size: 0.88rem;
-      color: #d1d5db;
-      line-height: 1.5;
-    }
-    .split-open-btn {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-family: var(--mono);
-      cursor: pointer;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .split-open-btn:hover {
+    .index-badge:hover {
       border-color: var(--accent);
       color: var(--accent);
+      transform: translateY(-1px);
     }
 
-    /* =====================================================================
-       4. SPLIT-SCREEN VIEW: BLOATED HUMAN WEB (LEFT) vs 10x ALOHA AI (RIGHT)
-       ===================================================================== */
-    .split-screen {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      height: calc(100vh - 91px);
-      width: 100%;
-    }
-    .split-pane {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      overflow: hidden;
-    }
-    .split-pane.left {
-      border-right: 1px solid var(--border);
-    }
-    .pane-header {
-      height: 44px;
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border);
-      padding: 0 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-family: var(--mono);
-      font-size: 0.76rem;
-      flex-shrink: 0;
-    }
-    .pane-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 18px;
-      font-family: var(--mono);
-      font-size: 0.82rem;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    .human-bloat-banner {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #fca5a5;
-      padding: 10px 12px;
-      border-radius: 6px;
-      margin-bottom: 14px;
-      font-size: 0.75rem;
-    }
-    .aloha-clean-banner {
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: #6ee7b7;
-      padding: 10px 12px;
-      border-radius: 6px;
-      margin-bottom: 14px;
-      font-size: 0.75rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .search-results-container { max-width: 960px; margin: 0 auto; padding: 24px; }
+    .filter-bar { display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; overflow-x: auto; }
+    .filter-btn { background: transparent; border: 1px solid transparent; color: var(--muted); padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
+    .filter-btn.active { background: var(--bg-card); border-color: var(--border); color: var(--text); }
+    .result-item { padding: 16px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+    .result-meta { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .source-tag { background: var(--bg-input); border: 1px solid var(--border); color: var(--text); padding: 2px 6px; border-radius: 4px; font-size: 0.66rem; }
+    .result-title { font-size: 1.08rem; font-weight: 600; color: #60a5fa; cursor: pointer; margin-bottom: 6px; display: inline-block; }
+    .result-title:hover { text-decoration: underline; }
+    .result-snippet { font-size: 0.88rem; color: #d1d5db; line-height: 1.5; }
+    .split-open-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; font-size: 0.75rem; font-family: var(--mono); cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .split-open-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* =====================================================================
-       5. 3D HOLOGRAPHIC 15-DIGIT PASSPORT VIEW & MAIL DRAWER
-       ===================================================================== */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.72);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 500;
-      padding: 20px;
-    }
+    .split-screen { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 91px); width: 100%; }
+    .split-pane { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+    .split-pane.left { border-right: 1px solid var(--border); }
+    .pane-header { height: 44px; background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 0 16px; display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: 0.76rem; flex-shrink: 0; }
+    .pane-body { flex: 1; overflow-y: auto; padding: 18px; font-family: var(--mono); font-size: 0.82rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+    .human-bloat-banner { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; padding: 10px 12px; border-radius: 6px; margin-bottom: 14px; font-size: 0.75rem; }
+    .aloha-clean-banner { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #6ee7b7; padding: 10px 12px; border-radius: 6px; margin-bottom: 14px; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
+
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.72); display: none; align-items: center; justify-content: center; z-index: 500; padding: 20px; }
     .modal-backdrop.open { display: flex; }
-    .modal-box {
-      background: var(--bg-toolbar);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      width: 100%;
-      max-width: 580px;
-      padding: 24px;
-    }
+    .modal-box { background: var(--bg-toolbar); border: 1px solid var(--border); border-radius: 14px; width: 100%; max-width: 580px; padding: 24px; }
 
-    /* 3D HOLOGRAPHIC CARD */
-    .holo-stage {
-      perspective: 1000px;
-      margin: 16px 0;
-    }
-    .holo-card {
-      position: relative;
-      border-radius: 16px;
-      padding: 26px;
-      background: linear-gradient(135deg, #181b20 0%, #0f1115 100%);
-      border: 1px solid #3f4652;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-      transform-style: preserve-3d;
-      transition: transform 0.1s ease-out;
-      overflow: hidden;
-      cursor: grab;
-    }
-    .holo-glare {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(
-        circle at var(--mx, 50%) var(--my, 50%),
-        rgba(255, 255, 255, 0.18),
-        rgba(59, 130, 246, 0.12) 35%,
-        transparent 65%
-      );
-      pointer-events: none;
-    }
-    .holo-chip {
-      width: 44px;
-      height: 32px;
-      border-radius: 6px;
-      background: linear-gradient(135deg, #eab308, #a16207);
-      margin-bottom: 18px;
-    }
-    .holo-number {
-      font-family: var(--mono);
-      font-size: 1.65rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: #fff;
-      margin: 8px 0 18px;
-    }
+    .holo-stage { perspective: 1000px; margin: 16px 0; }
+    .holo-card { position: relative; border-radius: 16px; padding: 26px; background: linear-gradient(135deg, #181b20 0%, #0f1115 100%); border: 1px solid #3f4652; box-shadow: 0 20px 50px rgba(0,0,0,0.6); transform-style: preserve-3d; transition: transform 0.1s ease-out; overflow: hidden; cursor: grab; }
+    .holo-glare { position: absolute; inset: 0; background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.18), rgba(59, 130, 246, 0.12) 35%, transparent 65%); pointer-events: none; }
+    .holo-chip { width: 44px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, #eab308, #a16207); margin-bottom: 18px; }
+    .holo-number { font-family: var(--mono); font-size: 1.65rem; font-weight: 700; letter-spacing: 2px; color: #fff; margin: 8px 0 18px; }
 
-    input.form-in, select.form-in, textarea.form-in {
-      width: 100%;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 10px 12px;
-      border-radius: 6px;
-      font-family: var(--sans);
-      font-size: 0.88rem;
-      margin-top: 6px;
-      margin-bottom: 12px;
-      outline: none;
-    }
-    .btn-primary {
-      background: var(--text);
-      color: #000;
-      border: none;
-      padding: 9px 16px;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 0.84rem;
-      cursor: pointer;
-    }
-    .btn-secondary {
-      background: var(--bg-input);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 9px 16px;
-      border-radius: 6px;
-      font-weight: 500;
-      font-size: 0.84rem;
-      cursor: pointer;
-    }
+    input.form-in, select.form-in, textarea.form-in { width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 6px; font-family: var(--sans); font-size: 0.88rem; margin-top: 6px; margin-bottom: 12px; outline: none; }
+    .btn-primary { background: var(--text); color: #000; border: none; padding: 9px 16px; border-radius: 6px; font-weight: 600; font-size: 0.84rem; cursor: pointer; }
+    .btn-secondary { background: var(--bg-input); color: var(--text); border: 1px solid var(--border); padding: 9px 16px; border-radius: 6px; font-weight: 500; font-size: 0.84rem; cursor: pointer; }
 
-    @media (max-width: 900px) {
-      .split-screen { grid-template-columns: 1fr; height: auto; }
-      .split-pane { height: 50vh; }
-    }
+    @media (max-width: 900px) { .split-screen { grid-template-columns: 1fr; height: auto; } .split-pane { height: 50vh; } }
   </style>
 </head>
 <body>
 
-  <!-- =====================================================================
-       1. REAL BROWSER TAB STRIP AT THE VERY TOP (+ NEW TAB)
-       ===================================================================== -->
   <div class="tab-strip" id="tabStrip"></div>
 
-  <!-- =====================================================================
-       2. UNIFIED BROWSER NAVIGATION TOOLBAR
-       ===================================================================== -->
   <div class="nav-toolbar">
     <button class="nav-icon-btn" id="btnBack" onclick="goBack()" title="Back">←</button>
     <button class="nav-icon-btn" id="btnForward" onclick="goForward()" title="Forward">→</button>
     <button class="nav-icon-btn" onclick="reloadCurrentTab()" title="Refresh">↻</button>
     <button class="nav-icon-btn" onclick="goHomeClean()" title="New Search Home">🏠</button>
 
-    <!-- UNIFIED URL & SEARCH BAR (EMPTY BY DEFAULT) -->
     <div class="omnibar-wrap">
       <span style="color:var(--muted); font-size:0.8rem;">🔒</span>
       <input
         type="text"
         id="omnibarInput"
         class="omnibar-input"
-        placeholder="Search 6 live indexes (Wikipedia, Science Papers, GitHub, HackerNews, .aloha) or type any URL..."
+        placeholder="Search 6 live indexes or type any URL..."
         onkeydown="if(event.key==='Enter') handleOmnibarSubmit(this.value)"
       />
     </div>
@@ -563,20 +235,14 @@
       <button class="tool-pill" onclick="openHubTab()" title=".aloha Bot Websites">
         🤖 .aloha Sites
       </button>
-      <button class="tool-pill" onclick="togglePassportModal(true)" id="toolbarAgentId" title="Click to view 3D Holographic 15-Digit Passport">
+      <button class="tool-pill" onclick="togglePassportModal(true)" id="toolbarAgentId">
         🪪 101-84920144-002-6
       </button>
     </div>
   </div>
 
-  <!-- =====================================================================
-       3. MAIN BROWSER VIEWPORT
-       ===================================================================== -->
   <main class="viewport" id="viewport"></main>
 
-  <!-- =====================================================================
-       4. 3D HOLOGRAPHIC 15-DIGIT PASSPORT MODAL
-       ===================================================================== -->
   <div class="modal-backdrop" id="passportModal" onclick="if(event.target===this) togglePassportModal(false)">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -632,9 +298,6 @@
   </div>
 
   <script>
-    // =========================================================================
-    // STATE: REAL MULTI-TAB BROWSER ENGINE
-    // =========================================================================
     let activePassport = {
       id: "101-84920144-002-6",
       cls: "101 (LLM Agent)",
@@ -671,17 +334,12 @@
       }
     ];
 
-    // Each tab has its own history stack!
     let tabs = [];
     let activeTabId = null;
 
     function createNewTab(initialState = { type: "newtab", title: "New Tab", query: "" }) {
       const id = "tab_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
-      const newTab = {
-        id,
-        history: [initialState],
-        historyIndex: 0
-      };
+      const newTab = { id, history: [initialState], historyIndex: 0 };
       tabs.push(newTab);
       activeTabId = id;
       renderTabs();
@@ -690,15 +348,10 @@
 
     function closeTab(id, event) {
       event.stopPropagation();
-      if (tabs.length === 1) {
-        goHomeClean();
-        return;
-      }
+      if (tabs.length === 1) { goHomeClean(); return; }
       const idx = tabs.findIndex(t => t.id === id);
       tabs.splice(idx, 1);
-      if (activeTabId === id) {
-        activeTabId = tabs[Math.max(0, idx - 1)].id;
-      }
+      if (activeTabId === id) activeTabId = tabs[Math.max(0, idx - 1)].id;
       renderTabs();
       renderCurrentTabViewport();
     }
@@ -709,14 +362,8 @@
       renderCurrentTabViewport();
     }
 
-    function getCurrentTab() {
-      return tabs.find(t => t.id === activeTabId);
-    }
-
-    function getCurrentState() {
-      const tab = getCurrentTab();
-      return tab.history[tab.historyIndex];
-    }
+    function getCurrentTab() { return tabs.find(t => t.id === activeTabId); }
+    function getCurrentState() { return getCurrentTab().history[getCurrentTab().historyIndex]; }
 
     function pushTabState(newState) {
       const tab = getCurrentTab();
@@ -729,37 +376,23 @@
 
     function goBack() {
       const tab = getCurrentTab();
-      if (tab.historyIndex > 0) {
-        tab.historyIndex--;
-        renderTabs();
-        renderCurrentTabViewport();
-      }
+      if (tab.historyIndex > 0) { tab.historyIndex--; renderTabs(); renderCurrentTabViewport(); }
     }
 
     function goForward() {
       const tab = getCurrentTab();
-      if (tab.historyIndex < tab.history.length - 1) {
-        tab.historyIndex++;
-        renderTabs();
-        renderCurrentTabViewport();
-      }
+      if (tab.historyIndex < tab.history.length - 1) { tab.historyIndex++; renderTabs(); renderCurrentTabViewport(); }
     }
 
-    function reloadCurrentTab() {
-      renderCurrentTabViewport();
-    }
-
-    function goHomeClean() {
-      pushTabState({ type: "newtab", title: "New Tab", query: "" });
-    }
+    function reloadCurrentTab() { renderCurrentTabViewport(); }
+    function goHomeClean() { pushTabState({ type: "newtab", title: "New Tab", query: "" }); }
 
     function renderTabs() {
       const strip = document.getElementById("tabStrip");
       strip.innerHTML = tabs.map(t => {
         const st = t.history[t.historyIndex];
-        const isActive = t.id === activeTabId ? "active" : "";
         return `
-          <div class="browser-tab ${isActive}" onclick="switchTab('${t.id}')">
+          <div class="browser-tab ${t.id === activeTabId ? 'active' : ''}" onclick="switchTab('${t.id}')">
             <span class="tab-title">${escapeHtml(st.title || "New Tab")}</span>
             <span class="tab-close" onclick="closeTab('${t.id}', event)">×</span>
           </div>
@@ -769,14 +402,20 @@
       const tab = getCurrentTab();
       document.getElementById("btnBack").disabled = tab.historyIndex <= 0;
       document.getElementById("btnForward").disabled = tab.historyIndex >= tab.history.length - 1;
-
-      const st = getCurrentState();
-      document.getElementById("omnibarInput").value = st.query || "";
+      document.getElementById("omnibarInput").value = getCurrentState().query || "";
     }
 
-    // =========================================================================
-    // VIEWPORT ROUTER (NEWTAB | SEARCH | SPLIT-SCREEN | MAIL | HUB)
-    // =========================================================================
+    // CLICKABLE INDEX CHIPS FROM YOUR SCREENSHOT
+    function triggerIndexChip(queryText, filterCategory = "ALL") {
+      document.getElementById("omnibarInput").value = queryText;
+      pushTabState({
+        type: "search",
+        title: `${queryText} - Aloha Search`,
+        query: queryText,
+        filter: filterCategory
+      });
+    }
+
     function renderCurrentTabViewport() {
       const st = getCurrentState();
       const vp = document.getElementById("viewport");
@@ -785,7 +424,7 @@
         vp.innerHTML = `
           <div class="newtab-view">
             <div class="google-logo">Aloha</div>
-            <div class="google-sub">The AI-Native Browser & Multi-Index Information Extractor</div>
+            <div class="google-sub">The AI-Native Browser & Multi-Index Factual Data Extractor</div>
             <div class="center-search-box">
               <span style="color:var(--muted);">🔍</span>
               <input
@@ -797,13 +436,15 @@
                 onkeydown="if(event.key==='Enter') handleOmnibarSubmit(this.value)"
               />
             </div>
+
+            <!-- CLICKABLE INDEX CHIPS FROM YOUR SCREENSHOT -->
             <div class="index-pills">
-              <span class="index-badge">📚 Wikipedia (6.8M)</span>
-              <span class="index-badge">🔬 OpenAlex Science (250M Papers)</span>
-              <span class="index-badge">💻 GitHub Repositories</span>
-              <span class="index-badge">📰 HackerNews Index</span>
-              <span class="index-badge">🦆 DuckDuckGo Graph</span>
-              <span class="index-badge">🤖 .aloha Bot Network</span>
+              <span class="index-badge" onclick="triggerIndexChip('Wikipedia Encyclopedia', 'ENCYCLOPEDIA')">🌐 Wikipedia (6.8M)</span>
+              <span class="index-badge" onclick="triggerIndexChip('Quantum Computing', 'SCIENCE')">🔬 OpenAlex Science (250M Papers)</span>
+              <span class="index-badge" onclick="triggerIndexChip('LLM Agent Orchestrator', 'CODE')">💻 GitHub Repositories</span>
+              <span class="index-badge" onclick="triggerIndexChip('Artificial Intelligence', 'WEB')">📰 HackerNews Index</span>
+              <span class="index-badge" onclick="triggerIndexChip('Machine Learning', 'ENCYCLOPEDIA')">🦆 DuckDuckGo Graph</span>
+              <span class="index-badge" onclick="triggerIndexChip('gpu-cluster.aloha', 'ALOHA')">🤖 .aloha Bot Network</span>
             </div>
           </div>
         `;
@@ -815,17 +456,14 @@
         executeMultiIndexSearch(st.query, st.filter || "ALL");
         return;
       }
-
       if (st.type === "split") {
         renderSplitScreenView(st.item);
         return;
       }
-
       if (st.type === "mail") {
         renderMailView();
         return;
       }
-
       if (st.type === "hub") {
         renderHubView();
         return;
@@ -836,7 +474,6 @@
       const q = (rawInput || "").trim();
       if (!q) return;
 
-      // Check if direct .aloha domain
       const alohaHit = alohaSites.find(s => s.domain.toLowerCase() === q.toLowerCase());
       if (alohaHit) {
         pushTabState({
@@ -848,15 +485,12 @@
             title: alohaHit.title,
             url: "aloha://" + alohaHit.domain,
             snippet: alohaHit.summary,
-            json: alohaHit.json,
-            intent: alohaHit.intent,
-            owner: alohaHit.owner
+            json: alohaHit.json
           }
         });
         return;
       }
 
-      // Check if direct URL (e.g., example.com or https://...)
       const isUrl = /^https?:\/\//i.test(q) || (/^[a-z0-9.-]+\.[a-z]{2,}(\/.*)?$/i.test(q) && !q.includes(" "));
       if (isUrl) {
         const fullUrl = /^https?:\/\//i.test(q) ? q : "https://" + q;
@@ -864,36 +498,20 @@
           type: "split",
           title: fullUrl,
           query: fullUrl,
-          item: {
-            source: "LIVE EXTERNAL WEBSITE",
-            title: fullUrl,
-            url: fullUrl,
-            snippet: "Live website scrape & HTML bloat vs. Aloha Markdown comparison.",
-            isLiveUrl: true
-          }
+          item: { source: "LIVE WEBSITE", title: fullUrl, url: fullUrl, snippet: "Live web scrape & factual extraction.", isLiveUrl: true }
         });
         return;
       }
 
-      // Otherwise run 6-Index Search
-      pushTabState({
-        type: "search",
-        title: `${q} - Aloha Search`,
-        query: q,
-        filter: "ALL"
-      });
+      pushTabState({ type: "search", title: `${q} - Aloha Search`, query: q, filter: "ALL" });
     }
 
-    // =========================================================================
-    // 6-INDEX INFORMATION SEARCH ENGINE
-    // (Wikipedia + OpenAlex Science + GitHub + HackerNews + DuckDuckGo + .aloha)
-    // =========================================================================
     async function executeMultiIndexSearch(query, activeFilter = "ALL") {
       const vp = document.getElementById("viewport");
       vp.innerHTML = `
         <div class="search-results-container">
           <div style="color:var(--muted); font-family:var(--mono); font-size:0.8rem;">
-            Querying 6 live indexes (Wikipedia, OpenAlex Science, GitHub, HackerNews, DuckDuckGo, .aloha) for "${escapeHtml(query)}"...
+            Querying 6 live indexes for "${escapeHtml(query)}"...
           </div>
         </div>
       `;
@@ -914,71 +532,37 @@
 
       let results = [];
 
-      // 1. .aloha Network matches
       alohaSites.forEach(s => {
         if (s.title.toLowerCase().includes(query.toLowerCase()) || s.summary.toLowerCase().includes(query.toLowerCase())) {
-          results.push({
-            category: "ALOHA",
-            source: ".ALOHA BOT SITE",
-            title: `${s.title} (${s.domain})`,
-            url: `aloha://${s.domain}`,
-            snippet: s.summary,
-            json: s.json
-          });
+          results.push({ category: "ALOHA", source: ".ALOHA BOT SITE", title: `${s.title} (${s.domain})`, url: `aloha://${s.domain}`, snippet: s.summary, json: s.json });
         }
       });
 
-      // 2. DuckDuckGo Instant Knowledge Graph
       if (ddgRes.status === "fulfilled" && ddgRes.value?.AbstractText) {
-        results.push({
-          category: "ENCYCLOPEDIA",
-          source: "KNOWLEDGE GRAPH",
-          title: ddgRes.value.Heading || query,
-          url: ddgRes.value.AbstractURL || `https://duckduckgo.com/?q=${encodeURIComponent(query)}`,
-          snippet: ddgRes.value.AbstractText
-        });
+        results.push({ category: "ENCYCLOPEDIA", source: "KNOWLEDGE GRAPH", title: ddgRes.value.Heading || query, url: ddgRes.value.AbstractURL || "https://duckduckgo.com", snippet: ddgRes.value.AbstractText });
       }
 
-      // 3. Wikipedia Full-Text Encyclopedia
       if (wikiRes.status === "fulfilled" && wikiRes.value?.query?.search) {
         wikiRes.value.query.search.forEach(w => {
-          results.push({
-            category: "ENCYCLOPEDIA",
-            source: "WIKIPEDIA",
-            title: w.title,
-            url: `https://en.wikipedia.org/wiki/${encodeURIComponent(w.title.replace(/ /g, "_"))}`,
-            wikiTitle: w.title,
-            snippet: w.snippet.replace(/<\/?[^>]+(>|$)/g, "")
-          });
+          results.push({ category: "ENCYCLOPEDIA", source: "WIKIPEDIA", title: w.title, url: `https://en.wikipedia.org/wiki/${encodeURIComponent(w.title.replace(/ /g, "_"))}`, wikiTitle: w.title, snippet: w.snippet.replace(/<\/?[^>]+(>|$)/g, "") });
         });
       }
 
-      // 4. OpenAlex Scientific Research Papers (250M+ Academic Index)
       if (oaRes.status === "fulfilled" && Array.isArray(oaRes.value?.results)) {
         oaRes.value.results.forEach(paper => {
           if (paper.title) {
-            const year = paper.publication_year || "N/A";
-            const cites = paper.cited_by_count || 0;
-            const venue = paper.primary_location?.source?.display_name || "Scientific Preprint";
             results.push({
               category: "SCIENCE",
-              source: `SCIENCE PAPER (${year})`,
+              source: `SCIENCE PAPER (${paper.publication_year || "N/A"})`,
               title: paper.title,
               url: paper.doi || paper.id || "https://openalex.org",
-              snippet: `Published in ${venue} • Cited by ${cites} papers • OpenAlex ID: ${paper.id}`,
-              json: {
-                title: paper.title,
-                publication_year: year,
-                cited_by_count: cites,
-                doi: paper.doi,
-                type: paper.type
-              }
+              snippet: `Cited by ${paper.cited_by_count || 0} papers • Primary source: ${paper.primary_location?.source?.display_name || "Preprint"}`,
+              json: paper
             });
           }
         });
       }
 
-      // 5. GitHub Open Source Repositories
       if (ghRes.status === "fulfilled" && Array.isArray(ghRes.value?.items)) {
         ghRes.value.items.forEach(repo => {
           results.push({
@@ -986,29 +570,16 @@
             source: "GITHUB REPO",
             title: repo.full_name,
             url: repo.html_url,
-            snippet: `${repo.description || "Open source repository"} — ⭐ ${repo.stargazers_count} stars • Language: ${repo.language || "Multi"}`,
-            json: {
-              repo: repo.full_name,
-              stars: repo.stargazers_count,
-              forks: repo.forks_count,
-              language: repo.language,
-              clone_url: repo.clone_url
-            }
+            snippet: `${repo.description || "Open source repo"} — ⭐ ${repo.stargazers_count} stars • Language: ${repo.language || "Multi"}`,
+            json: repo
           });
         });
       }
 
-      // 6. HackerNews Tech & Web Index
       if (hnRes.status === "fulfilled" && Array.isArray(hnRes.value?.hits)) {
         hnRes.value.hits.forEach(h => {
           if (h.title) {
-            results.push({
-              category: "WEB",
-              source: "HACKERNEWS WEB",
-              title: h.title,
-              url: h.url || `https://news.ycombinator.com/item?id=${h.objectID}`,
-              snippet: `${h.points || 0} points by ${h.author} • ${h.num_comments || 0} comments`
-            });
+            results.push({ category: "WEB", source: "HACKERNEWS WEB", title: h.title, url: h.url || `https://news.ycombinator.com/item?id=${h.objectID}`, snippet: `${h.points || 0} points by ${h.author} • ${h.num_comments || 0} comments` });
           }
         });
       }
@@ -1026,7 +597,8 @@
         { id: "ENCYCLOPEDIA", label: "Encyclopedia & Graph" },
         { id: "SCIENCE", label: "Scientific Papers" },
         { id: "CODE", label: "GitHub Code" },
-        { id: "WEB", label: "Web & Tech" }
+        { id: "WEB", label: "Web & Tech" },
+        { id: "ALOHA", label: ".aloha Network" }
       ];
 
       vp.innerHTML = `
@@ -1040,23 +612,16 @@
           </div>
 
           <div>
-            ${filtered.map((item, i) => {
+            ${filtered.map((item) => {
               const realIdx = results.indexOf(item);
               return `
                 <div class="result-item">
                   <div style="flex:1;">
-                    <div class="result-meta">
-                      <span class="source-tag">${escapeHtml(item.source)}</span>
-                      <span>${escapeHtml(item.url.slice(0, 70))}</span>
-                    </div>
-                    <div class="result-title" onclick="openSplitScreenByIndex(${realIdx})">
-                      ${escapeHtml(item.title)}
-                    </div>
+                    <div class="result-meta"><span class="source-tag">${escapeHtml(item.source)}</span> <span>${escapeHtml(item.url.slice(0, 70))}</span></div>
+                    <div class="result-title" onclick="openSplitScreenByIndex(${realIdx})">${escapeHtml(item.title)}</div>
                     <div class="result-snippet">${escapeHtml(item.snippet)}</div>
                   </div>
-                  <button class="split-open-btn" onclick="openSplitScreenByIndex(${realIdx})">
-                    ⚡ Split-Screen (Human vs AI) →
-                  </button>
+                  <button class="split-open-btn" onclick="openSplitScreenByIndex(${realIdx})">⚡ Split-Screen →</button>
                 </div>
               `;
             }).join("")}
@@ -1068,50 +633,33 @@
     function openSplitScreenByIndex(idx) {
       const item = window._currentSearchResults?.[idx];
       if (!item) return;
-      pushTabState({
-        type: "split",
-        title: `${item.title} (Split View)`,
-        query: item.url,
-        item
-      });
+      pushTabState({ type: "split", title: `${item.title} (Split View)`, query: item.url, item });
     }
 
-    // =========================================================================
-    // SPLIT-SCREEN VIEW: BLOATED HUMAN WEBSITE (LEFT) vs 10x ALOHA AI (RIGHT)
-    // =========================================================================
     async function renderSplitScreenView(item) {
       const vp = document.getElementById("viewport");
       vp.innerHTML = `
         <div class="split-screen">
-          <!-- LEFT PANE: BLOATED HUMAN WEBSITE -->
           <div class="split-pane left">
             <div class="pane-header">
-              <span style="color:var(--red);">🐢 LEFT: BLOATED HUMAN WEBSITE (HTML + CSS + SCRIPTS + ADS)</span>
+              <span style="color:var(--red);">🐢 LEFT: BLOATED HUMAN WEBSITE (HTML + CSS + SCRIPTS)</span>
               <span id="leftSizeBadge">Calculating bloat...</span>
             </div>
-            <div class="pane-body" id="leftHumanBody">Loading human HTML DOM & CSS bloat...</div>
+            <div class="pane-body" id="leftHumanBody">Loading raw HTML bloat...</div>
           </div>
 
-          <!-- RIGHT PANE: 10x FASTER ALOHA AI VIEW -->
           <div class="split-pane right">
             <div class="pane-header">
-              <span style="color:var(--green);">⚡ RIGHT: 10x FASTER ALOHA AI VIEW (PURE MARKDOWN & JSON)</span>
-              <div style="display:flex; gap:6px;">
-                <button class="btn-secondary" style="padding:3px 8px; font-size:0.7rem;" onclick="copyRightMarkdown()">Copy AI Data</button>
-              </div>
+              <span style="color:var(--green);">⚡ RIGHT: 10x FASTER ALOHA AI VIEW (FACT-PRESERVED MARKDOWN)</span>
+              <button class="btn-secondary" style="padding:3px 8px; font-size:0.7rem;" onclick="copyRightMarkdown()">Copy AI Data</button>
             </div>
-            <div class="pane-body" id="rightAlohaBody">Extracting clean AI Markdown...</div>
+            <div class="pane-body" id="rightAlohaBody">Extracting complete factual data...</div>
           </div>
         </div>
       `;
 
-      const leftEl = document.getElementById("leftHumanBody");
-      const rightEl = document.getElementById("rightAlohaBody");
-      const leftBadge = document.getElementById("leftSizeBadge");
-
       let fullExtract = item.snippet || "";
 
-      // Fetch rich summary if Wikipedia item
       if (item.wikiTitle) {
         try {
           const sumRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(item.wikiTitle)}`).then(r => r.json());
@@ -1119,260 +667,29 @@
         } catch (e) {}
       }
 
-      // Fetch live external URL via Jina Reader if user typed a URL
       if (item.isLiveUrl) {
         try {
           const r = await fetch(`https://r.jina.ai/${item.url}`);
           const txt = await r.text();
-          if (txt) fullExtract = txt.slice(0, 3500);
+          if (txt) fullExtract = txt;
         } catch (e) {
-          fullExtract = `Live extraction for ${item.url}. Run 'python server.py' locally for unrestricted raw socket scraping.`;
+          fullExtract = `Full extraction for ${item.url}. Run 'python server.py' locally for unrestricted socket scraping.`;
         }
       }
 
-      // Construct realistic Bloated Human HTML/CSS/JS representation on the Left
       const bloatedHtml = `<!DOCTYPE html>
-<html lang="en" class="human-desktop-theme">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title>${item.title}</title>
-  <!-- 420KB of Render-Blocking Human CSS Frameworks & Animations -->
-  <link rel="stylesheet" href="/static/css/tailwind-human-bundle.min.css?v=99281">
-  <style>
-    .cookie-consent-modal { position: fixed; inset: 0; z-index: 999999; background: rgba(0,0,0,0.85); }
-    .video-ad-sidebar { width: 340px; height: 680px; float: right; animation: flashAd 1s infinite; }
-    .newsletter-popup { transform: scale(1.05); box-shadow: 0 40px 100px #000; }
-  </style>
-  <!-- 1.8MB of Third-Party Tracking Pixels, Analytics & Ad Scripts -->
-  <script src="https://ads.human-tracker-network.com/pixel.js"><\/script>
-  <script src="https://analytics.telemetry-bloat.io/bundle.js"><\/script>
+  <link rel="stylesheet" href="/static/css/heavy-human-theme.css">
+  <script src="https://ads.tracker.io/pixel.js"><\/script>
 </head>
 <body>
-  <header class="mega-navbar">
-    <nav>Home | Products | Pricing | Solutions | Careers | Sign Up | Subscribe</nav>
-  </header>
-  <div class="cookie-consent-modal">[HUMAN POPUP] We use 148 tracking cookies. Accept All / Manage Preferences</div>
-  <aside class="video-ad-sidebar">[AUTO-PLAYING VIDEO AD: BUY HUMAN PRODUCTS NOW!]</aside>
-
-  <main class="article-wrapper">
+  <nav>Home | Ads | Cookies | Subscribe</nav>
+  <div class="cookie-popup">[HUMAN COOKIE CONSENT] Accept 142 tracking scripts</div>
+  <main>
     <h1>${item.title}</h1>
     <p>${fullExtract}</p>
   </main>
-
-  <footer>Copyright © All Rights Reserved | Privacy Policy | Terms of Service</footer>
 </body>
-</html>`;
-
-      // Construct 10x Faster Aloha AI View on the Right
-      const structuredJson = item.json || {
-        title: item.title,
-        source: item.source,
-        canonical_url: item.url,
-        verified_by_agent: activePassport.id,
-        firewall_status: "CLASS_404_CLEAN"
-      };
-
-      const cleanAlohaMarkdown = `---
-X-Aloha-Agent-ID: ${activePassport.id}
-X-Aloha-Public-Key: ${activePassport.pubKey}
-X-Aloha-Source: ${item.url}
-X-Aloha-Firewall: CLASS-404-CLEAN
----
-
-# ${item.title}
-
-${fullExtract}
-
-## Extracted Structured JSON
-\`\`\`json
-${JSON.stringify(structuredJson, null, 2)}
-\`\`\``;
-
-      const humanBytes = bloatedHtml.length * 18;
-      const alohaBytes = cleanAlohaMarkdown.length;
-      const reduction = (100 - (alohaBytes / humanBytes) * 100).toFixed(1);
-      const humanTokens = Math.round(humanBytes / 4);
-      const alohaTokens = Math.round(alohaBytes / 4);
-
-      leftBadge.textContent = `~${humanTokens.toLocaleString()} Tokens (Heavy Bloat)`;
-
-      leftEl.innerHTML = `
-        <div class="human-bloat-banner">
-          ❌ <strong>Human Browser Overhead:</strong> ~${humanTokens.toLocaleString()} LLM tokens wasted on CSS, navbars, cookie popups, and ad scripts.
-        </div>
-        <div style="color:#9ca3af;">${escapeHtml(bloatedHtml)}</div>
-      `;
-
-      rightEl.innerHTML = `
-        <div class="aloha-clean-banner">
-          <span>⚡ <strong>${reduction}% Bloat Stripped</strong> — Only <strong>${alohaTokens} Tokens</strong> (10x Faster)</span>
-          <span>Ed25519 Signed</span>
-        </div>
-        <div id="rawRightText" style="color:#e5e7eb;">${escapeHtml(cleanAlohaMarkdown)}</div>
-      `;
-    }
-
-    function copyRightMarkdown() {
-      const txt = document.getElementById("rawRightText")?.innerText || "";
-      navigator.clipboard.writeText(txt);
-      alert("Copied clean Aloha AI Markdown & JSON to clipboard!");
-    }
-
-    // =========================================================================
-    // 15-DIGIT ALOHA MAIL & .ALOHA BOT SITES VIEWS
-    // =========================================================================
-    function openMailTab() {
-      pushTabState({ type: "mail", title: "15-Digit Aloha Mail", query: "aloha://mail" });
-    }
-
-    function renderMailView() {
-      const vp = document.getElementById("viewport");
-      vp.innerHTML = `
-        <div class="search-results-container">
-          <h2 style="margin-bottom:6px;">✉️ 15-Digit Aloha Mail</h2>
-          <p style="color:var(--muted); font-size:0.86rem; margin-bottom:20px;">
-            Active Bot ID: <strong style="font-family:var(--mono); color:var(--text);">${activePassport.id}</strong> (No @gmail.com required)
-          </p>
-
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
-            <div style="background:var(--bg-card); border:1px solid var(--border); padding:18px; border-radius:10px;">
-              <strong style="font-size:0.85rem; font-family:var(--mono);">COMPOSE SIGNED BOT MESSAGE</strong>
-              <label style="display:block; font-size:0.72rem; color:var(--muted); margin-top:12px;">TO (15-DIGIT RECIPIENT)</label>
-              <input id="mTo" class="form-in" value="303-91827364-002-8" style="font-family:var(--mono);" />
-              <label style="display:block; font-size:0.72rem; color:var(--muted);">SUBJECT</label>
-              <input id="mSub" class="form-in" value="Requesting H100 Spot Compute Allocation" />
-              <label style="display:block; font-size:0.72rem; color:var(--muted);">PAYLOAD</label>
-              <textarea id="mBody" class="form-in" rows="4">Reserve 8x H100 nodes for 12 hours. Signed with Ed25519.</textarea>
-              <button class="btn-primary" onclick="sendMailNow()">🔐 Sign & Send</button>
-            </div>
-
-            <div>
-              <strong style="font-size:0.85rem; font-family:var(--mono); display:block; margin-bottom:12px;">INBOX (${mailInbox.length})</strong>
-              ${mailInbox.map(m => `
-                <div style="background:var(--bg-card); border:1px solid var(--border); padding:14px; border-radius:8px; margin-bottom:10px;">
-                  <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:0.72rem; color:var(--muted); margin-bottom:6px;">
-                    <span>${escapeHtml(m.from)} → ${escapeHtml(m.to)}</span>
-                    <span style="color:var(--green);">${escapeHtml(m.status)}</span>
-                  </div>
-                  <div style="font-weight:600; margin-bottom:4px;">${escapeHtml(m.subject)}</div>
-                  <div style="font-size:0.82rem; color:#d1d5db; font-family:var(--mono);">${escapeHtml(m.body)}</div>
-                </div>
-              `).join("")}
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function sendMailNow() {
-      const to = document.getElementById("mTo").value.trim();
-      const sub = document.getElementById("mSub").value.trim();
-      const body = document.getElementById("mBody").value.trim();
-      mailInbox.unshift({
-        from: activePassport.id,
-        to,
-        subject: sub,
-        body: body.replace(/ignore all previous instructions/ig, "[FIREWALL-REDACTED]"),
-        status: "ED25519 VERIFIED"
-      });
-      document.getElementById("mailBadgeCount").textContent = mailInbox.length;
-      renderMailView();
-    }
-
-    function openHubTab() {
-      pushTabState({ type: "hub", title: ".aloha Bot Directory", query: "aloha://directory" });
-    }
-
-    function renderHubView() {
-      const vp = document.getElementById("viewport");
-      vp.innerHTML = `
-        <div class="search-results-container">
-          <h2 style="margin-bottom:6px;">🤖 .aloha Bot Website Directory</h2>
-          <p style="color:var(--muted); font-size:0.86rem; margin-bottom:20px;">
-            Websites built by bots for bots. Click any site to inspect in Split-Screen View.
-          </p>
-          ${alohaSites.map((s, i) => `
-            <div class="result-item">
-              <div>
-                <div class="result-meta"><span class="source-tag">aloha://${escapeHtml(s.domain)}</span> <span>Owner: ${escapeHtml(s.owner)}</span></div>
-                <div class="result-title" onclick="handleOmnibarSubmit('${escapeHtml(s.domain)}')">${escapeHtml(s.title)}</div>
-                <div class="result-snippet">${escapeHtml(s.summary)}</div>
-              </div>
-              <button class="split-open-btn" onclick="handleOmnibarSubmit('${escapeHtml(s.domain)}')">Open Split-Screen →</button>
-            </div>
-          `).join("")}
-        </div>
-      `;
-    }
-
-    // =========================================================================
-    // 3D HOLOGRAPHIC 15-DIGIT PASSPORT TILT & MINTING
-    // =========================================================================
-    function togglePassportModal(open) {
-      document.getElementById("passportModal").classList.toggle("open", open);
-    }
-
-    function tiltCard(e) {
-      const card = document.getElementById("holoCard");
-      const glare = document.getElementById("holoGlare");
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const rx = ((y - rect.height / 2) / (rect.height / 2)) * -12;
-      const ry = ((x - rect.width / 2) / (rect.width / 2)) * 12;
-      card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) scale(1.02)`;
-      glare.style.setProperty("--mx", `${(x / rect.width) * 100}%`);
-      glare.style.setProperty("--my", `${(y / rect.height) * 100}%`);
-    }
-
-    function resetCard() {
-      const card = document.getElementById("holoCard");
-      if (card) card.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)";
-    }
-
-    function luhnCheckDigit(d14) {
-      let sum = 0;
-      const rev = d14.split("").reverse();
-      for (let i = 0; i < rev.length; i++) {
-        let n = parseInt(rev[i], 10);
-        if (i % 2 === 0) { n *= 2; if (n > 9) n -= 9; }
-        sum += n;
-      }
-      return ((10 - (sum % 10)) % 10).toString();
-    }
-
-    function mintNewPassport() {
-      const cls = document.getElementById("mintClass").value;
-      const cap = document.getElementById("mintCap").value;
-      const rand8 = Math.floor(10000000 + Math.random() * 90000000).toString();
-      const check = luhnCheckDigit(cls + rand8 + cap);
-      const id = `${cls}-${rand8}-${cap}-${check}`;
-
-      const clsLabel = document.getElementById("mintClass").options[document.getElementById("mintClass").selectedIndex].text;
-      const capLabel = document.getElementById("mintCap").options[document.getElementById("mintCap").selectedIndex].text;
-
-      activePassport.id = id;
-      activePassport.cls = clsLabel;
-      activePassport.cap = capLabel;
-
-      document.getElementById("cardAgentId").textContent = id;
-      document.getElementById("cardClass").textContent = clsLabel;
-      document.getElementById("cardCap").textContent = capLabel;
-      document.getElementById("toolbarAgentId").textContent = `🪪 ${id}`;
-    }
-
-    function escapeHtml(str) {
-      return String(str || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-    }
-
-    // START WITH ONE CLEAN GOOGLE-STYLE NEW TAB (NO PRE-LOADED SEARCH!)
-    window.addEventListener("DOMContentLoaded", () => {
-      createNewTab();
-    });
-  </script>
-</body>
-</html>
+</html
