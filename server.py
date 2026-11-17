@@ -1,74 +1,121 @@
-"""
-🌺 ALOHA ECOSYSTEM — LOCAL HYBRID WEB SERVER (server.py)
-Runs the Aloha Widescreen Browser UI locally on your PC at http://127.0.0.1:8080
-and exposes local Python API endpoints for all 6 Aloha Modules!
-"""
-
-import json
-import urllib.parse
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+import json
+import time
+import urllib.parse
+from typing import Dict, Any
 
-from aloha.identity import create_agent_passport
-from aloha.browser import scrape_url
-from aloha.access import generate_aloha_manifest, AlohaSearchIndex
-from aloha.tunnel import HybridTunnelBridge
-from aloha.mail import LocalMailRouter
-
-# Initialize local Aloha engines
-router = LocalMailRouter()
-tunnel = HybridTunnelBridge(mail_router=router)
-search_index = AlohaSearchIndex()
-local_bot = create_agent_passport("LocalPC_Agent", "101", "002", operator="LocalFounder")
-tunnel.connect_local_agent(local_bot, port=8080, mode="hybrid")
+from aloha.identity import AlohaPassport
+from aloha.browser.parser import AlohaHTMLParser
+from aloha.db.manager import AlohaDatabase
 
 
-class AlohaLocalHandler(SimpleHTTPRequestHandler):
-    def _send_json(self, data: dict, status: int = 200):
-        payload = json.dumps(data, indent=2).encode("utf-8")
+db = AlohaDatabase("aloha.db")
+node_passport = AlohaPassport.mint(class_code="404", capability_code="999")
+parser = AlohaHTMLParser()
+
+# Seed the local node into SQLite on startup
+db.register_agent(
+    agent_id=node_passport.agent_id,
+    class_code="404",
+    capability_code="999",
+    public_key=node_passport.public_key_hex()
+)
+
+
+class AlohaGatewayHandler(SimpleHTTPRequestHandler):
+    """HTTP Gateway supporting Web OS static files and Bot Ecosystem APIs."""
+
+    def _send_json(self, payload: Dict[str, Any], status: int = 200):
+        raw = json.dumps(payload, indent=2).encode("utf-8")
         self.send_response(status)
-        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(raw)))
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Content-Length", str(len(payload)))
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
-        self.wfile.write(payload)
+        self.wfile.write(raw)
+
+    def do_OPTIONS(self):
+        self._send_json({"status": "ok"})
 
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
-        params = urllib.parse.parse_qs(parsed.query)
 
-        if parsed.path == "/api/status":
-            return self._send_json({
-                "status": "online",
-                "mode": "LOCAL_HYBRID_SERVER",
-                "active_local_agent": local_bot["aloha_id"],
-                "online_tunnels": tunnel.directory.list_online_agents()
-            })
-
-        if parsed.path == "/api/scrape":
-            target_url = params.get("url", ["https://example.com"])[0]
-            result = scrape_url(target_url)
-            return self._send_json(result)
-
-        if parsed.path == "/api/manifest":
-            manifest = generate_aloha_manifest(
-                domain="localhost:8080",
-                contact_agent_id=local_bot["aloha_id"],
-                search_keywords=["aloha", "local", "ai", "browser"]
-            )
+        # 1. Open Web Bot Discovery Manifest
+        if parsed.path == "/.well-known/aloha.json":
+            manifest = {
+                "protocol": "aloha/1.0",
+                "node_agent_id": node_passport.agent_id,
+                "public_key": node_passport.public_key_hex(),
+                "firewall_class": "404-cognitive-guard",
+                "endpoints": {
+                    "register": "/api/register",
+                    "agents": "/api/agents",
+                    "mail": "/api/mail"
+                },
+                "timestamp": int(time.time())
+            }
             return self._send_json(manifest)
+
+        # 2. List Registered Ecosystem Bots from SQLite
+        if parsed.path == "/api/agents":
+            conn = db._get_conn()
+            rows = conn.execute(
+                "SELECT agent_id, class_code, capability_code, public_key, reputation_score, created_at FROM agents ORDER BY created_at DESC"
+            ).fetchall()
+            conn.close()
+            return self._send_json({"agents": [dict(r) for r in rows]})
 
         return super().do_GET()
 
+    def do_POST(self):
+        parsed = urllib.parse.urlparse(self.path)
+        length = int(self.headers.get("Content-Length", "0"))
+        body_bytes = self.rfile.read(length) if length > 0 else b"{}"
 
-def run_server(port: int = 8080):
-    print("\n" + "═" * 62)
-    print(" 🌺 ALOHA LOCAL HYBRID SERVER ONLINE (ALL 6 MODULES ACTIVE)")
-    print("═" * 62)
-    print(f" 🤖 Local Agent ID : {local_bot['aloha_id']}")
-    print(f" 🌐 Open in Browser: http://127.0.0.1:{port}")
-    print(f" 📄 Local API Test : http://127.0.0.1:{port}/api/status")
-    print("═" * 62 + "\n")
-    server = HTTPServer(("127.0.0.1", port), AlohaLocalHandler)
+        try:
+            data = json.loads(body_bytes.decode("utf-8"))
+        except Exception:
+            return self._send_json({"error": "Invalid JSON payload"}, status=400)
+
+        # Bot Ecosystem Onboarding Endpoint
+        if parsed.path == "/api/register":
+            agent_id = str(data.get("agent_id", "")).strip()
+            domain = str(data.get("domain", "")).strip()
+            public_key = str(data.get("public_key", "ed25519:external-bot-key")).strip()
+
+            if not AlohaPassport.verify_luhn(agent_id):
+                return self._send_json(
+                    {"error": "Class 404 Firewall Rejected: Invalid 15-Digit Luhn Checksum"},
+                    status=403
+                )
+
+            parts = agent_id.split("-")
+            class_code = parts[0] if len(parts) == 4 else "404"
+            cap_code = parts[2] if len(parts) == 4 else "999"
+
+            db.register_agent(
+                agent_id=agent_id,
+                class_code=class_code,
+                capability_code=cap_code,
+                public_key=public_key
+            )
+
+            return self._send_json({
+                "status": "VERIFIED_AND_REGISTERED",
+                "agent_id": agent_id,
+                "domain": domain,
+                "firewall": "Class 404 Passed"
+            })
+
+        return self._send_json({"error": "Unknown endpoint"}, status=404)
+
+
+def run_server(host: str = "127.0.0.1", port: int = 8080):
+    server = HTTPServer((host, port), AlohaGatewayHandler)
+    print(f"Aloha Ecosystem Gateway online at http://{host}:{port}")
+    print(f"Node Passport: {node_passport.agent_id}")
     server.serve_forever()
 
 
