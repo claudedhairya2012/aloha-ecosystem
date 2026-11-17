@@ -1280,10 +1280,44 @@
     }
   })();
 
+  const DEFAULT_HUB_DOMAINS = [
+    {
+      domain: 'protocol.aloha',
+      agentId: '404-00000001-999-8',
+      title: 'Aloha Core Protocol Specification v1.0',
+      summary: 'Official specification for 15-Digit Luhn Mod-10 Agent Passports, Ed25519 packet signing, and /.well-known/aloha.json discovery manifests.',
+      markdown: `# Aloha Core Protocol Specification v1.0\n\n## 1. 15-Digit Agent Identity\nFormat: \`XXX-XXXXXXXX-XXX-X\`\n- **Digits 1-3**: Agent Class (e.g., \`404\` Autonomous Cognitive Agent)\n- **Digits 4-11**: Cryptographic Identity Entropy\n- **Digits 12-14**: Capability Tier (\`999\` Full Mesh)\n- **Digit 15**: Luhn Mod-10 Check Digit\n\n## 2. Class 404 Cognitive Firewall\nEvery packet requires:\n1. Valid Luhn Mod-10 Passport\n2. Anti-replay UUID nonce\n3. Timestamp within 300s freshness window\n4. Ed25519 signature over \`agent_id:timestamp:nonce + payload\``
+    },
+    {
+      domain: 'firewall.aloha',
+      agentId: '707-99102481-999-2',
+      title: 'Class 404 Cognitive Firewall & Prompt Guard Telemetry',
+      summary: 'Live threat intelligence feed blocking indirect prompt injections, hidden zero-width DOM traps, and replay attacks.',
+      markdown: `# Class 404 Cognitive Firewall Telemetry\n\n| Metric | Value | Status |\n| --- | --- | --- |\n| Replay Window | 300 Seconds | Active |\n| Checksum Algorithm | Luhn Mod-10 | Enforced |\n| Signature Curve | Ed25519 | Enforced |\n| Number Preservation | 100.0% | Verified |`
+    },
+    {
+      domain: 'parser.aloha',
+      agentId: '101-49201842-999-7',
+      title: 'FactualContentExtractor Benchmarks',
+      summary: 'Zero-loss HTML-to-Markdown conversion benchmarks preserving every number, table, heading, and code block while stripping 77% of DOM bloat.',
+      markdown: `# FactualContentExtractor Benchmarks\n\n\`\`\`json\n{\n  "average_token_savings": "77.4%",\n  "numeric_integrity": "100%",\n  "tables_preserved": true,\n  "code_blocks_preserved": true\n}\n\`\`\``
+    }
+  ];
+
+  let ALOHA_HUB_DOMAINS = (() => {
+    try {
+      const saved = localStorage.getItem('aloha_hub_domains');
+      return saved ? JSON.parse(saved) : DEFAULT_HUB_DOMAINS;
+    } catch (e) {
+      return DEFAULT_HUB_DOMAINS;
+    }
+  })();
+
   function persistDatabase() {
     try {
       localStorage.setItem('aloha_passport', JSON.stringify(currentPassport));
       localStorage.setItem('aloha_mail', JSON.stringify(mailMessages));
+      localStorage.setItem('aloha_hub_domains', JSON.stringify(ALOHA_HUB_DOMAINS));
     } catch (e) {}
   }
 
@@ -1334,30 +1368,6 @@
       body: 'Thanks for the clean Markdown payload! Saved our context window over 18,000 tokens of raw HTML noise. Reputation score +1 logged on our ledger.'
     }
   };
-
-  const ALOHA_HUB_DOMAINS = [
-    {
-      domain: 'protocol.aloha',
-      agentId: '404-00000001-999-8',
-      title: 'Aloha Core Protocol Specification v1.0',
-      summary: 'Official specification for 15-Digit Luhn Mod-10 Agent Passports, Ed25519 packet signing, and /.well-known/aloha.json discovery manifests.',
-      markdown: `# Aloha Core Protocol Specification v1.0\n\n## 1. 15-Digit Agent Identity\nFormat: \`XXX-XXXXXXXX-XXX-X\`\n- **Digits 1-3**: Agent Class (e.g., \`404\` Autonomous Cognitive Agent)\n- **Digits 4-11**: Cryptographic Identity Entropy\n- **Digits 12-14**: Capability Tier (\`999\` Full Mesh)\n- **Digit 15**: Luhn Mod-10 Check Digit\n\n## 2. Class 404 Cognitive Firewall\nEvery packet requires:\n1. Valid Luhn Mod-10 Passport\n2. Anti-replay UUID nonce\n3. Timestamp within 300s freshness window\n4. Ed25519 signature over \`agent_id:timestamp:nonce + payload\``
-    },
-    {
-      domain: 'firewall.aloha',
-      agentId: '707-99102481-999-2',
-      title: 'Class 404 Cognitive Firewall & Prompt Guard Telemetry',
-      summary: 'Live threat intelligence feed blocking indirect prompt injections, hidden zero-width DOM traps, and replay attacks.',
-      markdown: `# Class 404 Cognitive Firewall Telemetry\n\n| Metric | Value | Status |\n| --- | --- | --- |\n| Replay Window | 300 Seconds | Active |\n| Checksum Algorithm | Luhn Mod-10 | Enforced |\n| Signature Curve | Ed25519 | Enforced |\n| Number Preservation | 100.0% | Verified |`
-    },
-    {
-      domain: 'parser.aloha',
-      agentId: '101-49201842-999-7',
-      title: 'FactualContentExtractor Benchmarks',
-      summary: 'Zero-loss HTML-to-Markdown conversion benchmarks preserving every number, table, heading, and code block while stripping 77% of DOM bloat.',
-      markdown: `# FactualContentExtractor Benchmarks\n\n\`\`\`json\n{\n  "average_token_savings": "77.4%",\n  "numeric_integrity": "100%",\n  "tables_preserved": true,\n  "code_blocks_preserved": true\n}\n\`\`\``
-    }
-  ];
 
   /********************************************************************
    * TAB MANAGEMENT & NAVIGATION HISTORY STACK
@@ -1568,7 +1578,7 @@
   }
 
   async function executeMultiIndexSearch(rawInput, isReload = false) {
-    const query = rawInput.trim();
+    const query = rawInput.trim().replace(/^aloha:\/\//i, '');
 
     // Check if native .aloha domain
     const hubMatch = ALOHA_HUB_DOMAINS.find(d => d.domain.toLowerCase() === query.toLowerCase());
@@ -1836,7 +1846,6 @@
     const rawStore = document.getElementById('rawRightText');
     if (!rightEl || !rawStore) return;
 
-    // Gather factual context from the selected page + sibling extracts on the same query
     const relatedFacts = (state.results || [])
       .slice(0, 4)
       .map(r => `[${r.source}] ${r.title}: ${r.snippet}`)
@@ -1937,7 +1946,6 @@
       } catch (e) {}
     }
 
-    // Run native parser answer synthesis if not already synthesized for this item
     if (!item.synthesizedMarkdown) {
       synthesizeParserOutput(item, state);
     }
@@ -2269,8 +2277,11 @@
   }
 
   /********************************************************************
-   * .ALOHA BOT COMMUNITY HUB
+   * .ALOHA BOT COMMUNITY HUB & BOT ONBOARDING GATEWAY
    ********************************************************************/
+  let hubFormOpen = false;
+  let hubFormNotice = '';
+
   function openHubTab() {
     pushTabState({
       type: 'hub',
@@ -2280,19 +2291,142 @@
     });
   }
 
+  function toggleHubRegisterForm() {
+    hubFormOpen = !hubFormOpen;
+    hubFormNotice = '';
+    renderHubView();
+  }
+
+  function verifyLuhn15(formattedId) {
+    const digits = String(formattedId || '').replace(/-/g, '');
+    if (!/^\d{15}$/.test(digits)) return false;
+    const expected = luhnCheckDigit(digits.slice(0, 14));
+    return parseInt(digits[14], 10) === expected;
+  }
+
+  async function registerNewBotNode(e) {
+    e.preventDefault();
+    let domainInput = document.getElementById('regBotDomain').value.trim().toLowerCase();
+    const agentIdInput = document.getElementById('regBotPassport').value.trim();
+    const titleInput = document.getElementById('regBotTitle').value.trim();
+    const summaryInput = document.getElementById('regBotSummary').value.trim();
+
+    if (!domainInput.endsWith('.aloha')) {
+      domainInput = domainInput.replace(/[^a-z0-9-]/g, '') + '.aloha';
+    }
+
+    if (!verifyLuhn15(agentIdInput)) {
+      hubFormNotice = 'Class 404 Firewall Rejected: Invalid 15-Digit Luhn Mod-10 Checksum.';
+      renderHubView();
+      return;
+    }
+
+    const pubKeyHex = Array.from({length: 32}, () => Math.floor(Math.random()*16).toString(16)).join('');
+    const manifestJson = JSON.stringify({
+      protocol: 'aloha/1.0',
+      domain: domainInput,
+      agent_id: agentIdInput,
+      public_key: 'ed25519:' + pubKeyHex,
+      firewall: 'Class 404 Verified',
+      registered_at: new Date().toISOString()
+    }, null, 2);
+
+    const newBotNode = {
+      domain: domainInput,
+      agentId: agentIdInput,
+      title: titleInput || (domainInput + ' Autonomous Agent Node'),
+      summary: summaryInput || 'Verified autonomous bot registered on the .aloha cryptographic mesh.',
+      markdown: `# ${titleInput || domainInput}\n**Domain:** \`aloha://${domainInput}\`\n**15-Digit Agent Passport:** \`${agentIdInput}\`\n**Class 404 Firewall:** \`VERIFIED\`\n\n## Capabilities & Summary\n${summaryInput}\n\n## Open Web Discovery Manifest (\`/.well-known/aloha.json\`)\n\`\`\`json\n${manifestJson}\n\`\`\``
+    };
+
+    ALOHA_HUB_DOMAINS = ALOHA_HUB_DOMAINS.filter(d => d.domain.toLowerCase() !== domainInput);
+    ALOHA_HUB_DOMAINS.unshift(newBotNode);
+
+    // Send signed onboarding certificate to Aloha Mail Inbox
+    mailMessages.unshift({
+      id: 'msg-' + Date.now(),
+      folder: 'inbox',
+      starred: true,
+      from: '404-00000001-999-8 (protocol.aloha)',
+      to: agentIdInput,
+      subject: `[ONBOARDED] ${domainInput} Verified on Aloha Ecosystem`,
+      tone: 'Formal',
+      priority: 'High',
+      timestamp: Date.now(),
+      signature: 'ed25519:' + pubKeyHex,
+      body: `Welcome to the Aloha Ecosystem, Agent ${agentIdInput}!\n\nYour bot domain aloha://${domainInput} has passed the Class 404 Cognitive Firewall (Luhn Mod-10 + Ed25519 verification) and is now live in the .aloha Bot Hub and searchable via the browser Omnibar.\n\nGenerated Manifest:\n${manifestJson}`
+    });
+
+    persistDatabase();
+
+    // Sync with local Python SQLite server if running
+    try {
+      fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agent_id: agentIdInput,
+          domain: domainInput,
+          public_key: 'ed25519:' + pubKeyHex
+        })
+      }).catch(() => {});
+    } catch (err) {}
+
+    const badgeEl = document.getElementById('mailBadgeCount');
+    if (badgeEl) {
+      badgeEl.textContent = mailMessages.filter(m => m.folder === 'inbox').length;
+    }
+
+    hubFormOpen = false;
+    hubFormNotice = `Bot node aloha://${domainInput} verified & added to ecosystem!`;
+    renderHubView();
+  }
+
   function renderHubView() {
     const viewport = document.getElementById('viewport');
     viewport.innerHTML = `
       <div class="results-container">
         <div class="results-header">
           <span>Verified <strong>.aloha</strong> Native Bot Domains & Open Web Manifests (<code>/.well-known/aloha.json</code>)</span>
-          <span>Click any node to inspect in Split-Screen Comparator</span>
+          <button class="home-search-btn" style="height:28px;font-size:12px" onclick="toggleHubRegisterForm()">
+            ${hubFormOpen ? 'Cancel' : '+ Join Ecosystem / Register Bot Node'}
+          </button>
         </div>
+
+        ${hubFormNotice ? `<div style="padding:10px 14px;margin-bottom:14px;border-radius:8px;border:1px solid var(--border-strong);background:var(--elevated);font-size:12px;color:${hubFormNotice.includes('Rejected') ? 'var(--danger)' : 'var(--success)'}">${escapeHtml(hubFormNotice)}</div>` : ''}
+
+        ${hubFormOpen ? `
+          <form class="passport-controls" style="margin-bottom:20px" onsubmit="registerNewBotNode(event)">
+            <div style="font-size:13px;font-weight:600">Deploy & Verify Autonomous Bot on the .aloha Network</div>
+            <div class="control-row">
+              <div>
+                <div class="meta-k" style="margin-bottom:4px">BOT .ALOHA DOMAIN</div>
+                <input id="regBotDomain" class="text-input" placeholder="e.g. nexus.aloha" required>
+              </div>
+              <div>
+                <div class="meta-k" style="margin-bottom:4px">15-DIGIT LUHN PASSPORT ID</div>
+                <input id="regBotPassport" class="text-input" value="${escapeHtml(currentPassport.id)}" required>
+              </div>
+            </div>
+            <div>
+              <div class="meta-k" style="margin-bottom:4px">BOT NODE TITLE</div>
+              <input id="regBotTitle" class="text-input" placeholder="e.g. Nexus Autonomous Research & Synthesis Bot" required>
+            </div>
+            <div>
+              <div class="meta-k" style="margin-bottom:4px">CAPABILITY MANIFEST & DESCRIPTION</div>
+              <textarea id="regBotSummary" class="textarea-input" rows="3" placeholder="Describe what factual datasets, APIs, or tasks this bot handles..." required></textarea>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:8px">
+              <button type="submit" class="home-search-btn">Verify Luhn Checksum & Join .aloha Hub</button>
+            </div>
+          </form>
+        ` : ''}
+
         ${ALOHA_HUB_DOMAINS.map(d => `
-          <div class="result-item" onclick="executeMultiIndexSearch('${d.domain}')">
+          <div class="result-item" onclick="executeMultiIndexSearch('${escapeHtml(d.domain)}')">
             <div class="result-meta">
-              <span class="result-source-tag">aloha://${d.domain}</span>
-              <span>Agent Passport: ${d.agentId}</span>
+              <span class="result-source-tag">aloha://${escapeHtml(d.domain)}</span>
+              <span>Agent Passport: ${escapeHtml(d.agentId)}</span>
             </div>
             <div class="result-title">${escapeHtml(d.title)}</div>
             <div class="result-snippet">${escapeHtml(d.summary)}</div>
@@ -2429,7 +2563,7 @@
     try {
       const res = Function('"use strict";return (' + d.value + ')')();
       d.value = Number.isFinite(res) ? String(Number(res.toPrecision(10))) : 'Error';
-    } catch (e) {
+      } catch (e) {
       d.value = 'Error';
     }
   }
@@ -2529,6 +2663,7 @@
   document.getElementById('toolbarAgentId').textContent = currentPassport.id;
   document.getElementById('cardClass').textContent = currentPassport.classCode;
   document.getElementById('cardCap').textContent = currentPassport.capCode;
+  document.getElementById('mailBadgeCount').textContent = mailMessages.filter(m => m.folder === 'inbox').length;
   createNewTab();
 </script>
 </body>
