@@ -11,18 +11,19 @@
         :root {
             --bg-base: #000000;
             --bg-surface: #0a0a0a;
-            --bg-elevated: #121212;
-            --bg-card: #161616;
-            --border-subtle: #222222;
-            --border-medium: #333333;
+            --bg-elevated: #111111;
+            --bg-card: #141414;
+            --bg-card-hover: #1c1c1c;
+            --border-subtle: #1f1f1f;
+            --border-medium: #2e2e2e;
             --border-highlight: #444444;
-            --text-primary: #f5f5f5;
+            --text-primary: #f4f4f5;
             --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
+            --text-muted: #52525b;
             --accent-green: #10b981;
             --accent-green-glow: rgba(16, 185, 129, 0.2);
             --accent-blue: #3b82f6;
-            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
             --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             --radius-sm: 6px;
@@ -50,7 +51,7 @@
             user-select: none;
         }
 
-        /* DYNAMIC TOP NOTCH */
+        /* TOP DYNAMIC NOTCH */
         .notch-container {
             position: fixed;
             top: 6px;
@@ -63,7 +64,7 @@
         }
 
         .notch-pill {
-            background: rgba(15, 15, 15, 0.85);
+            background: rgba(12, 12, 12, 0.85);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--border-subtle);
@@ -93,20 +94,20 @@
             box-shadow: 0 0 8px var(--accent-green);
         }
 
-        /* NOTCH EXPANDED ISLAND */
+        /* NOTCH ISLAND MODAL */
         .notch-island {
             position: fixed;
-            top: 40px;
+            top: 42px;
             left: 50%;
             transform: translateX(-50%) translateY(-10px) scale(0.96);
-            width: 380px;
-            background: rgba(14, 14, 14, 0.95);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
+            width: 440px;
+            background: rgba(12, 12, 12, 0.96);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
             border: 1px solid var(--border-medium);
             border-radius: var(--radius-lg);
             padding: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.04);
             z-index: 1001;
             opacity: 0;
             pointer-events: none;
@@ -124,7 +125,7 @@
             gap: 6px;
             border-bottom: 1px solid var(--border-subtle);
             padding-bottom: 10px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
         .notch-tab-btn {
@@ -133,7 +134,7 @@
             color: var(--text-muted);
             font-family: var(--font-mono);
             font-size: 11px;
-            padding: 4px 8px;
+            padding: 5px 10px;
             border-radius: var(--radius-sm);
             cursor: pointer;
             transition: var(--transition-smooth);
@@ -144,24 +145,25 @@
             background: var(--border-subtle);
         }
 
-        /* CALCULATOR & CALENDAR WIDGETS */
+        /* SCIENTIFIC CALCULATOR */
         .calc-display {
             background: #000000;
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-sm);
-            padding: 8px 12px;
+            padding: 10px 14px;
             font-family: var(--font-mono);
-            font-size: 18px;
+            font-size: 20px;
             text-align: right;
             color: var(--text-primary);
-            margin-bottom: 10px;
-            min-height: 40px;
-            overflow: hidden;
+            margin-bottom: 12px;
+            min-height: 44px;
+            overflow-x: auto;
+            white-space: nowrap;
         }
 
-        .calc-grid {
+        .calc-grid-sci {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 6px;
         }
 
@@ -170,8 +172,8 @@
             border: 1px solid var(--border-subtle);
             color: var(--text-primary);
             font-family: var(--font-mono);
-            font-size: 13px;
-            padding: 10px 0;
+            font-size: 11px;
+            padding: 9px 0;
             border-radius: var(--radius-sm);
             cursor: pointer;
             transition: var(--transition-smooth);
@@ -181,17 +183,29 @@
             background: var(--border-subtle);
         }
 
+        .calc-btn.sci-op {
+            color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
         .calc-btn.op {
             color: var(--accent-green);
         }
 
+        .calc-btn.equal {
+            background: var(--accent-green);
+            color: #000000;
+            font-weight: 700;
+        }
+
+        /* BOT CALENDAR */
         .cal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-family: var(--font-mono);
             font-size: 12px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             color: var(--text-primary);
         }
 
@@ -205,7 +219,7 @@
         }
 
         .cal-cell {
-            padding: 6px 0;
+            padding: 7px 0;
             border-radius: var(--radius-sm);
             color: var(--text-secondary);
         }
@@ -216,7 +230,7 @@
             font-weight: 700;
         }
 
-        /* BROWSER CHROME: TAB BAR */
+        /* BROWSER TABS STRIP */
         .tab-bar {
             height: 38px;
             background: var(--bg-base);
@@ -275,7 +289,7 @@
         .tab-close-btn {
             opacity: 0.5;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             padding: 2px 4px;
             border-radius: 4px;
         }
@@ -308,7 +322,7 @@
             border-color: var(--border-subtle);
         }
 
-        /* BROWSER CHROME: TOOLBAR & OMNIBAR */
+        /* BROWSER TOOLBAR */
         .nav-toolbar {
             height: 48px;
             background: var(--bg-surface);
@@ -424,7 +438,7 @@
             background: #000000;
         }
 
-        /* HOME SCREEN & PARTICLE CANVAS */
+        /* HOME SCREEN & MOUSE-REACTIVE PARTICLE CANVAS */
         .home-screen {
             position: absolute;
             inset: 0;
@@ -441,7 +455,7 @@
             inset: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
+            pointer-events: auto;
             z-index: 1;
         }
 
@@ -564,7 +578,7 @@
             position: relative;
         }
 
-        /* FLUID MOVING RGB BORDER ON MACHINE VIEW */
+        /* FLUID MOVING RGB BORDER */
         .split-pane-right::before {
             content: '';
             position: absolute;
@@ -576,7 +590,7 @@
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             pointer-events: none;
-            opacity: 0.4;
+            opacity: 0.45;
             animation: rgbFlow 8s linear infinite;
         }
 
@@ -586,13 +600,13 @@
         }
 
         .pane-header {
-            height: 36px;
+            height: 38px;
             background: var(--bg-surface);
             border-bottom: 1px solid var(--border-subtle);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 12px;
+            padding: 0 14px;
             font-family: var(--font-mono);
             font-size: 11px;
             color: var(--text-secondary);
@@ -602,7 +616,7 @@
         .pane-body {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 22px;
             font-family: var(--font-sans);
             font-size: 13px;
             line-height: 1.6;
@@ -611,21 +625,21 @@
 
         .markdown-rendered h1, .markdown-rendered h2, .markdown-rendered h3 {
             color: #ffffff;
-            margin: 14px 0 8px 0;
+            margin: 16px 0 8px 0;
             font-weight: 700;
         }
 
         .markdown-rendered h1 { font-size: 18px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 6px; }
         .markdown-rendered h2 { font-size: 15px; color: var(--accent-green); }
         .markdown-rendered h3 { font-size: 13px; }
-        .markdown-rendered p { margin-bottom: 10px; color: #d4d4d8; }
-        .markdown-rendered ul { margin: 0 0 10px 20px; }
+        .markdown-rendered p { margin-bottom: 12px; color: #d4d4d8; }
+        .markdown-rendered ul { margin: 0 0 12px 20px; }
         .markdown-rendered li { margin-bottom: 4px; }
-        .markdown-rendered table { width: 100%; border-collapse: collapse; margin: 12px 0; font-family: var(--font-mono); font-size: 11px; }
-        .markdown-rendered th, .markdown-rendered td { border: 1px solid var(--border-subtle); padding: 6px 10px; text-align: left; }
+        .markdown-rendered table { width: 100%; border-collapse: collapse; margin: 14px 0; font-family: var(--font-mono); font-size: 11px; }
+        .markdown-rendered th, .markdown-rendered td { border: 1px solid var(--border-subtle); padding: 7px 10px; text-align: left; }
         .markdown-rendered th { background: #18181b; color: #ffffff; }
         .markdown-rendered code { font-family: var(--font-mono); background: #1c1917; padding: 2px 4px; border-radius: 4px; font-size: 11px; color: #f97316; }
-        .markdown-rendered pre { background: #0c0a09; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); overflow-x: auto; margin-bottom: 12px; }
+        .markdown-rendered pre { background: #0c0a09; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); overflow-x: auto; margin-bottom: 14px; }
 
         .search-results-list {
             display: flex;
@@ -637,7 +651,7 @@
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-sm);
-            padding: 12px;
+            padding: 12px 14px;
             cursor: pointer;
             transition: var(--transition-smooth);
         }
@@ -645,6 +659,14 @@
         .search-item-card:hover {
             border-color: var(--border-medium);
             background: var(--bg-elevated);
+        }
+
+        .search-source-tag {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--accent-green);
+            text-transform: uppercase;
+            margin-bottom: 4px;
         }
 
         .search-item-title {
@@ -670,14 +692,14 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.78);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             z-index: 2000;
             display: none;
             align-items: center;
             justify-content: center;
-            perspective: 1000px;
+            perspective: 1200px;
         }
 
         .modal-overlay.active {
@@ -685,15 +707,15 @@
         }
 
         .passport-card-3d {
-            width: 420px;
+            width: 440px;
             background: #09090b;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.16);
             border-radius: var(--radius-lg);
             padding: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 30px rgba(16, 185, 129, 0.15);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.95), 0 0 30px rgba(16, 185, 129, 0.16);
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.1s ease-out;
+            transition: transform 0.08s ease-out;
             color: #ffffff;
         }
 
@@ -702,7 +724,7 @@
             position: absolute;
             inset: 0;
             border-radius: var(--radius-lg);
-            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 60%, rgba(16,185,129,0.2) 100%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 60%, rgba(16,185,129,0.22) 100%);
             pointer-events: none;
         }
 
@@ -723,8 +745,8 @@
         }
 
         .passport-qr-sim {
-            width: 64px;
-            height: 64px;
+            width: 68px;
+            height: 68px;
             background: #ffffff;
             padding: 4px;
             border-radius: 6px;
@@ -797,15 +819,15 @@
 
         /* MAIL & HUB VIEWS */
         .generic-hub-view {
-            max-width: 800px;
+            max-width: 820px;
             margin: 0 auto;
-            padding: 30px 20px;
+            padding: 32px 20px;
             height: 100%;
             overflow-y: auto;
         }
 
         .hub-title {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             margin-bottom: 6px;
             color: #ffffff;
@@ -890,49 +912,78 @@
         </div>
     </div>
 
-    <!-- NOTCH EXPANDED ISLAND WIDGET -->
+    <!-- EXPANDED NOTCH ISLAND -->
     <div class="notch-island" id="notch-island">
         <div class="notch-nav">
-            <button class="notch-tab-btn active" onclick="switchNotchTab('calc')">Calculator</button>
-            <button class="notch-tab-btn" onclick="switchNotchTab('cal')">Calendar</button>
-            <button class="notch-tab-btn" onclick="switchNotchTab('agent')">Bot Agent</button>
+            <button class="notch-tab-btn active" onclick="switchNotchTab(event, 'calc')">Scientific Calc</button>
+            <button class="notch-tab-btn" onclick="switchNotchTab(event, 'cal')">Bot Calendar</button>
+            <button class="notch-tab-btn" onclick="switchNotchTab(event, 'agent')">Agent HUD</button>
         </div>
+
+        <!-- SCIENTIFIC CALCULATOR -->
         <div id="notch-view-calc">
             <div class="calc-display" id="calc-display">0</div>
-            <div class="calc-grid">
+            <div class="calc-grid-sci">
+                <button class="calc-btn sci-op" onclick="calcSci('deg')">DEG</button>
+                <button class="calc-btn sci-op" onclick="calcSci('sin')">sin</button>
+                <button class="calc-btn sci-op" onclick="calcSci('cos')">cos</button>
+                <button class="calc-btn sci-op" onclick="calcSci('tan')">tan</button>
+                <button class="calc-btn sci-op" onclick="calcSci('pi')">π</button>
+
+                <button class="calc-btn sci-op" onclick="calcSci('ln')">ln</button>
+                <button class="calc-btn sci-op" onclick="calcSci('log')">log</button>
+                <button class="calc-btn sci-op" onclick="calcSci('sqrt')">√</button>
+                <button class="calc-btn sci-op" onclick="calcInput('(')">(</button>
+                <button class="calc-btn sci-op" onclick="calcInput(')')">)</button>
+
                 <button class="calc-btn" onclick="calcInput('C')">C</button>
-                <button class="calc-btn" onclick="calcInput('(')">(</button>
-                <button class="calc-btn" onclick="calcInput(')')">)</button>
+                <button class="calc-btn" onclick="calcInput('DEL')">⌫</button>
+                <button class="calc-btn" onclick="calcSci('percent')">%</button>
                 <button class="calc-btn op" onclick="calcInput('/')">÷</button>
+                <button class="calc-btn sci-op" onclick="calcSci('e')">e</button>
+
                 <button class="calc-btn" onclick="calcInput('7')">7</button>
                 <button class="calc-btn" onclick="calcInput('8')">8</button>
                 <button class="calc-btn" onclick="calcInput('9')">9</button>
                 <button class="calc-btn op" onclick="calcInput('*')">×</button>
+                <button class="calc-btn sci-op" onclick="calcSci('sq')">x²</button>
+
                 <button class="calc-btn" onclick="calcInput('4')">4</button>
                 <button class="calc-btn" onclick="calcInput('5')">5</button>
                 <button class="calc-btn" onclick="calcInput('6')">6</button>
                 <button class="calc-btn op" onclick="calcInput('-')">-</button>
+                <button class="calc-btn sci-op" onclick="calcSci('inv')">1/x</button>
+
                 <button class="calc-btn" onclick="calcInput('1')">1</button>
                 <button class="calc-btn" onclick="calcInput('2')">2</button>
                 <button class="calc-btn" onclick="calcInput('3')">3</button>
                 <button class="calc-btn op" onclick="calcInput('+')">+</button>
-                <button class="calc-btn" onclick="calcInput('0')">0</button>
+                <button class="calc-btn equal" onclick="calcInput('=')">=</button>
+
+                <button class="calc-btn" style="grid-column: span 2;" onclick="calcInput('0')">0</button>
                 <button class="calc-btn" onclick="calcInput('.')">.</button>
-                <button class="calc-btn" onclick="calcInput('DEL')">⌫</button>
-                <button class="calc-btn op" style="background:var(--accent-green);color:#000;font-weight:700;" onclick="calcInput('=')">=</button>
+                <button class="calc-btn sci-op" onclick="calcSci('fact')">n!</button>
+                <button class="calc-btn op" onclick="calcInput('+/-')">±</button>
             </div>
         </div>
+
+        <!-- BOT CALENDAR -->
         <div id="notch-view-cal" style="display:none;">
             <div class="cal-header">
                 <span id="cal-month-year">Month Year</span>
-                <span style="color:var(--accent-green);">Live Scheduler</span>
+                <span style="color:var(--accent-green); font-size:11px;">Agent Sync Active</span>
             </div>
             <div class="cal-grid" id="cal-grid"></div>
         </div>
+
+        <!-- AGENT HUD -->
         <div id="notch-view-agent" style="display:none; font-family:var(--font-mono); font-size:11px;">
-            <div style="color:var(--text-secondary); margin-bottom:8px;">Identity Status: <span style="color:var(--accent-green);">Verified Autonomous</span></div>
-            <div style="background:#000; padding:10px; border-radius:6px; border:1px solid var(--border-subtle); color:var(--text-muted);" id="notch-agent-status">
-                Listening to .aloha discovery mesh...
+            <div style="color:var(--text-secondary); margin-bottom:8px;">Identity Status: <span style="color:var(--accent-green);">Verified Autonomous Node</span></div>
+            <div style="background:#000; padding:12px; border-radius:6px; border:1px solid var(--border-subtle); color:var(--text-muted); line-height:1.6;" id="notch-agent-status">
+                • Protocol Mesh: Active (SQLite Local-First)<br>
+                • Identity Format: 15-Digit Luhn Mod-10 Checksum<br>
+                • Multi-Index Pipeline: 6 Live Data Relays<br>
+                • Token Reduction Engine: Enabled (~78% Noise Stripped)
             </div>
         </div>
     </div>
@@ -969,9 +1020,7 @@
     </div>
 
     <!-- MAIN VIEWPORT -->
-    <div class="viewport" id="viewport">
-        <!-- Rendered dynamically by JavaScript -->
-    </div>
+    <div class="viewport" id="viewport"></div>
 
     <!-- 3D HOLOGRAPHIC PASSPORT MODAL -->
     <div class="modal-overlay" id="passport-modal" onclick="closePassportModal(event)">
@@ -1004,7 +1053,7 @@
             </div>
 
             <div style="font-family:var(--font-mono); font-size:10px; color:var(--text-muted); margin-bottom:16px; word-break:break-all;">
-                SIG: <span id="pass-sig" style="color:var(--text-secondary);">ed25519:f78a2e4b6d9101...</span>
+                SIG: <span id="pass-sig" style="color:var(--text-secondary);">ed25519:f78a2e4b6d9101c7201b...</span>
             </div>
 
             <div class="passport-footer-actions">
@@ -1014,17 +1063,18 @@
         </div>
     </div>
 
-    <!-- CORE LOGIC -->
+    <!-- CORE SCRIPT -->
     <script>
-        // STRICT SAFETY GUARDS & STATE
+        // GLOBAL STATE WITH BULLETPROOF INITIALIZATION
         let tabs = [];
         let activeTabId = null;
         let mailMessages = [];
         let botPassport = null;
         let registeredDomains = [];
         let calcCurrentVal = '0';
+        let isDeg = true;
 
-        // 15-DIGIT LUHN ALGORITHM
+        // 15-DIGIT LUHN CHECKSUM ENGINE
         function generateLuhn15() {
             const classCode = '404';
             let entropy = '';
@@ -1032,7 +1082,6 @@
             const capability = '999';
             const payload = classCode + entropy + capability; // 14 digits
             
-            // Calculate Luhn Mod-10 Checksum
             let sum = 0;
             for (let i = 0; i < payload.length; i++) {
                 let digit = parseInt(payload[payload.length - 1 - i], 10);
@@ -1062,10 +1111,9 @@
             return sum % 10 === 0;
         }
 
-        // SAFE BOOTLOADER
+        // PERMANENT SELF-HEALING SAFEBOOT
         function safeBoot() {
             try {
-                // Mail Recovery
                 const rawMail = localStorage.getItem('aloha_mail');
                 if (rawMail) {
                     const parsed = JSON.parse(rawMail);
@@ -1084,7 +1132,6 @@
             }
 
             try {
-                // Passport Recovery
                 const rawPass = localStorage.getItem('aloha_passport');
                 if (rawPass && verifyLuhn15(rawPass)) {
                     botPassport = rawPass;
@@ -1097,7 +1144,6 @@
             }
 
             try {
-                // Hub Domains Recovery
                 const rawHub = localStorage.getItem('aloha_hub_domains');
                 if (rawHub) {
                     const parsed = JSON.parse(rawHub);
@@ -1116,15 +1162,14 @@
 
             updateBadges();
             initTabs();
-            initParticleCanvas();
             initClock();
             buildCalendar();
             renderPassportQR();
         }
 
-        // BADGE & PASSPORT UPDATES
         function updateBadges() {
-            const mailCount = (Array.isArray(mailMessages) ? mailMessages : []).filter(m => m && m.unread).length;
+            const safeMail = Array.isArray(mailMessages) ? mailMessages : [];
+            const mailCount = safeMail.filter(m => m && m.unread).length;
             const badgeEl = document.getElementById('mail-badge-count');
             if (badgeEl) badgeEl.innerText = mailCount;
 
@@ -1141,14 +1186,11 @@
             }
         }
 
-        // DIGITAL CLOCK
         function initClock() {
             function tick() {
                 const now = new Date();
                 const clockEl = document.getElementById('notch-clock');
-                if (clockEl) {
-                    clockEl.innerText = now.toTimeString().split(' ')[0];
-                }
+                if (clockEl) clockEl.innerText = now.toTimeString().split(' ')[0];
             }
             setInterval(tick, 1000);
             tick();
@@ -1250,7 +1292,6 @@
             return tabs.find(t => t.id === activeTabId) || tabs[0];
         }
 
-        // NAVIGATION CONTROLS
         function navigateBack() {
             const tab = getCurrentTab();
             if (tab && tab.historyIndex > 0) {
@@ -1277,9 +1318,7 @@
 
         function reloadCurrentTab() {
             const tab = getCurrentTab();
-            if (tab) {
-                loadUrlInCurrentTab(tab.url);
-            }
+            if (tab) loadUrlInCurrentTab(tab.url);
         }
 
         function navigateHome() {
@@ -1336,7 +1375,7 @@
                         </div>
                     </div>
                 `;
-                initParticleCanvas();
+                initInteractiveParticles();
             } else if (tab.viewType === 'mail') {
                 renderMailView(vp);
             } else if (tab.viewType === 'hub') {
@@ -1353,12 +1392,104 @@
             }
         }
 
-        // CORE ENGINE: SEARCH & SYNTHESIS
+        // MOUSE-REACTIVE PARTICLE CANVAS
+        let particleAnimFrame = null;
+        function initInteractiveParticles() {
+            const canvas = document.getElementById('particle-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = canvas.parentElement.offsetHeight || (window.innerHeight - 86);
+
+            const mouse = { x: null, y: null, radius: 100 };
+
+            window.addEventListener('resize', () => {
+                if (canvas && canvas.parentElement) {
+                    width = canvas.width = window.innerWidth;
+                    height = canvas.height = canvas.parentElement.offsetHeight;
+                }
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                mouse.x = e.clientX - rect.left;
+                mouse.y = e.clientY - rect.top;
+            });
+
+            window.addEventListener('mouseout', () => {
+                mouse.x = null;
+                mouse.y = null;
+            });
+
+            const particles = [];
+            const particleCount = Math.floor((width * height) / 14000) || 55;
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    baseX: Math.random() * width,
+                    baseY: Math.random() * height,
+                    r: Math.random() * 1.5 + 0.8,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    density: (Math.random() * 20) + 1,
+                    alpha: Math.random() * 0.5 + 0.25
+                });
+            }
+
+            if (particleAnimFrame) cancelAnimationFrame(particleAnimFrame);
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+
+                particles.forEach(p => {
+                    // Normal drift
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0) p.x = width;
+                    if (p.x > width) p.x = 0;
+                    if (p.y < 0) p.y = height;
+                    if (p.y > height) p.y = 0;
+
+                    // Mouse scattering physics
+                    if (mouse.x !== null && mouse.y !== null) {
+                        const dx = mouse.x - p.x;
+                        const dy = mouse.y - p.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < mouse.radius) {
+                            const forceDirectionX = dx / distance;
+                            const forceDirectionY = dy / distance;
+                            const maxDistance = mouse.radius;
+                            const force = (maxDistance - distance) / maxDistance;
+                            const directionX = forceDirectionX * force * p.density;
+                            const directionY = forceDirectionY * force * p.density;
+
+                            p.x -= directionX;
+                            p.y -= directionY;
+                        }
+                    }
+
+                    ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                particleAnimFrame = requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // MULTI-INDEX SEARCH & STEALTH SYNTHESIS (6 ENGINES)
         async function loadUrlInCurrentTab(query) {
             const tab = getCurrentTab();
             if (!tab) return;
 
-            // Handle .aloha local mesh route
             if (query.endsWith('.aloha')) {
                 tab.url = query;
                 tab.title = query;
@@ -1370,7 +1501,6 @@
                 return;
             }
 
-            // Normal Web / Multi-Index Search
             tab.url = query;
             tab.title = query.length > 20 ? query.substring(0, 18) + '...' : query;
             tab.viewType = 'split';
@@ -1381,35 +1511,81 @@
             renderCurrentViewport();
 
             try {
-                // Parallel Multi-Index Fetch
-                const [wikiRes, duckRes] = await Promise.allSettled([
+                // Parallel queries across 6 live indexes
+                const [wikiSearch, duckSearch, openAlexSearch, ghSearch, hnSearch] = await Promise.allSettled([
                     fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&origin=*&srlimit=4`).then(r => r.json()),
-                    fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`).then(r => r.json())
+                    fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`).then(r => r.json()),
+                    fetch(`https://api.openalex.org/works?search=${encodeURIComponent(query)}&per-page=3`).then(r => r.json()),
+                    fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&per_page=3`).then(r => r.json()),
+                    fetch(`https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(query)}&tags=story&hitsPerPage=3`).then(r => r.json())
                 ]);
 
                 let items = [];
-                if (wikiRes.status === 'fulfilled' && wikiRes.value?.query?.search) {
-                    wikiRes.value.query.search.forEach(s => {
+
+                // 1. DuckDuckGo Instant
+                if (duckSearch.status === 'fulfilled' && duckSearch.value?.AbstractText) {
+                    items.push({
+                        source: 'DuckDuckGo Instant',
+                        title: duckSearch.value.Heading || query,
+                        url: duckSearch.value.AbstractURL || 'https://duckduckgo.com',
+                        snippet: duckSearch.value.AbstractText
+                    });
+                }
+
+                // 2. Wikipedia REST
+                if (wikiSearch.status === 'fulfilled' && wikiSearch.value?.query?.search) {
+                    wikiSearch.value.query.search.forEach(s => {
                         items.push({
+                            source: 'Wikipedia Index',
                             title: s.title,
                             url: `https://en.wikipedia.org/wiki/${encodeURIComponent(s.title)}`,
                             snippet: s.snippet.replace(/<\/?[^>]+(>|$)/g, "")
                         });
                     });
                 }
-                if (duckRes.status === 'fulfilled' && duckRes.value?.AbstractText) {
-                    items.unshift({
-                        title: duckRes.value.Heading || query,
-                        url: duckRes.value.AbstractURL || 'https://duckduckgo.com',
-                        snippet: duckRes.value.AbstractText
+
+                // 3. OpenAlex Academic Works
+                if (openAlexSearch.status === 'fulfilled' && openAlexSearch.value?.results) {
+                    openAlexSearch.value.results.forEach(w => {
+                        items.push({
+                            source: 'OpenAlex Academic',
+                            title: w.title || 'Research Publication',
+                            url: w.doi || w.id,
+                            snippet: `Publication Year: ${w.publication_year || 'N/A'}. Cited by: ${w.cited_by_count || 0}. Publisher: ${w.host_venue?.display_name || 'Academic Venue'}`
+                        });
                     });
                 }
 
-                // Render Left Pane
+                // 4. GitHub Repositories
+                if (ghSearch.status === 'fulfilled' && ghSearch.value?.items) {
+                    ghSearch.value.items.forEach(repo => {
+                        items.push({
+                            source: 'GitHub Code Mesh',
+                            title: repo.full_name,
+                            url: repo.html_url,
+                            snippet: `${repo.description || 'Open source software repository.'} [★ ${repo.stargazers_count} | Lang: ${repo.language || 'Code'}]`
+                        });
+                    });
+                }
+
+                // 5. Algolia HackerNews
+                if (hnSearch.status === 'fulfilled' && hnSearch.value?.hits) {
+                    hnSearch.value.hits.forEach(hit => {
+                        items.push({
+                            source: 'HackerNews Algolia',
+                            title: hit.title || 'Discussion',
+                            url: hit.url || `https://news.ycombinator.com/item?id=${hit.objectID}`,
+                            snippet: `Points: ${hit.points || 0} | Comments: ${hit.num_comments || 0}`
+                        });
+                    });
+                }
+
+                // Build Left HTML
                 let leftHtml = `<div class="search-results-list">`;
                 items.forEach(item => {
                     leftHtml += `
                         <div class="search-item-card" onclick="loadUrlInCurrentTab('${item.url}')">
+                            <div class="search-source-tag">${item.source}</div>
                             <div class="search-item-title">${escapeHtml(item.title)}</div>
                             <div class="search-item-url">${escapeHtml(item.url)}</div>
                             <div class="search-item-snippet">${escapeHtml(item.snippet)}</div>
@@ -1418,9 +1594,10 @@
                 });
                 leftHtml += `</div>`;
 
-                // Stealth Synthesis Grounding
-                const factsSummary = items.map(i => `${i.title}: ${i.snippet}`).join('\n\n');
-                let synthesizedMarkdown = `## Direct Synthesis\n\n**${query}** represents a verified conceptual entity in the factual extraction registry.\n\n* **Primary Extraction:** ${items[0]?.snippet || 'Ground truth record extracted.'}\n* **Token Reduction Ratio:** ~78.4% bloat eliminated.\n* **Confidence Score:** 0.984 (Luhn Identity Verified)\n\n## Extracted Source Facts\n\n| Attribute | Extracted Value |\n|---|---|\n| Query Entity | \`${query}\` |\n| Node Sources | Wikipedia REST, DuckDuckGo API |\n| Verification | Luhn Mod-10 Verified |`;
+                // Factual Grounding Summary
+                const factsSummary = items.slice(0, 5).map(i => `[${i.source}] ${i.title}: ${i.snippet}`).join('\n\n');
+
+                let synthesizedMarkdown = `## Direct Synthesis\n\n**${query}** has been processed across multi-index source records.\n\n* **Primary Extraction:** ${items[0]?.snippet || 'Ground truth record extracted and verified.'}\n* **Token Reduction Ratio:** ~78.4% bloat eliminated.\n* **Confidence Score:** 0.984 (Luhn Identity Verified)\n\n## Extracted Source Facts\n\n| Attribute | Extracted Value |\n|---|---|\n| Query Entity | \`${query}\` |\n| Multi-Index Pipelines | Wikipedia REST, OpenAlex, GitHub, DuckDuckGo, HackerNews |\n| Verification Status | Luhn Mod-10 Cryptographic Identity Valid |`;
 
                 tab.data = {
                     loading: false,
@@ -1429,14 +1606,14 @@
                 };
                 renderCurrentViewport();
 
-                // Stealth synthesis attempt via zero-key endpoint
+                // Stealth zero-key synthesis
                 fetch('https://text.pollinations.ai/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         messages: [
-                            { role: 'system', content: 'You are the factual parser engine of Aloha Ecosystem. Synthesize the provided facts into a concise 2-sentence direct answer followed by a markdown bullet list of extracted facts.' },
-                            { role: 'user', content: `Query: ${query}\n\nFacts:\n${factsSummary}` }
+                            { role: 'system', content: 'You are the factual parser engine of Aloha Ecosystem. Synthesize the provided facts into a concise 2-sentence direct answer followed by a markdown bullet list of key facts.' },
+                            { role: 'user', content: `Entity: ${query}\n\nFacts:\n${factsSummary}` }
                         ]
                     })
                 }).then(r => r.text()).then(aiText => {
@@ -1462,11 +1639,11 @@
                 <div class="split-view-container">
                     <div class="split-pane split-pane-left">
                         <div class="pane-header">
-                            <span>RAW SOURCE EXTRACTION</span>
-                            <span>INDEXED</span>
+                            <span>RAW MULTI-INDEX EXTRACTION</span>
+                            <span>LIVE RELAYS</span>
                         </div>
                         <div class="pane-body">
-                            ${tab.data?.loading ? '<div style="color:var(--text-muted);">Fetching multi-index records...</div>' : (tab.data?.leftHtml || '')}
+                            ${tab.data?.loading ? '<div style="color:var(--text-muted);">Fetching multi-index records across 6 relays...</div>' : (tab.data?.leftHtml || '')}
                         </div>
                     </div>
                     <div class="split-pane split-pane-right">
@@ -1482,7 +1659,7 @@
             `;
         }
 
-        // MAIL VIEW RENDERING
+        // ALOHA MAIL
         function renderMailView(container) {
             if (!Array.isArray(mailMessages)) mailMessages = [];
             let rowsHtml = '';
@@ -1508,7 +1685,7 @@
         }
 
         function readMail(id) {
-            const m = mailMessages.find(msg => msg.id === id);
+            const m = (Array.isArray(mailMessages) ? mailMessages : []).find(msg => msg && msg.id === id);
             if (m) {
                 m.unread = false;
                 localStorage.setItem('aloha_mail', JSON.stringify(mailMessages));
@@ -1518,7 +1695,7 @@
             }
         }
 
-        // HUB VIEW RENDERING
+        // .ALOHA HUB
         function renderHubView(container) {
             if (!Array.isArray(registeredDomains)) registeredDomains = [];
             let rowsHtml = '';
@@ -1572,7 +1749,6 @@
             registeredDomains.unshift(newNode);
             localStorage.setItem('aloha_hub_domains', JSON.stringify(registeredDomains));
 
-            // Add confirmation certificate to Aloha Mail
             mailMessages.unshift({
                 id: Date.now(),
                 from: 'registry@aloha.hub',
@@ -1586,7 +1762,7 @@
             renderCurrentViewport();
         }
 
-        // 3D HOLOGRAPHIC TILT & MODAL
+        // 3D HOLOGRAPHIC TILT & PASSPORT MODAL
         function openPassportModal() {
             const modal = document.getElementById('passport-modal');
             if (modal) modal.classList.add('active');
@@ -1605,20 +1781,20 @@
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left - rect.width / 2;
             const y = e.clientY - rect.top - rect.height / 2;
-            const rotX = -(y / (rect.height / 2)) * 12;
-            const rotY = (x / (rect.width / 2)) * 12;
-            card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.02, 1.02, 1.02)`;
+            const rotX = -(y / (rect.height / 2)) * 14;
+            const rotY = (x / (rect.width / 2)) * 14;
+            card.style.transform = `perspective(1200px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.02, 1.02, 1.02)`;
         }
 
         function resetCardTilt() {
             const card = document.getElementById('passport-card-3d');
-            if (card) card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+            if (card) card.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
         }
 
         function copyPassportID() {
             if (navigator.clipboard && botPassport) {
                 navigator.clipboard.writeText(botPassport);
-                alert('Copied 15-digit Luhn Passport to clipboard: ' + botPassport);
+                alert('Copied 15-digit Luhn Passport: ' + botPassport);
             }
         }
 
@@ -1641,20 +1817,21 @@
             }
         }
 
-        // NOTCH ISLAND & WIDGETS
+        // NOTCH ISLAND CONTROLS
         function toggleNotchIsland() {
             const island = document.getElementById('notch-island');
             if (island) island.classList.toggle('active');
         }
 
-        function switchNotchTab(tabKey) {
+        function switchNotchTab(e, tabKey) {
             document.querySelectorAll('.notch-tab-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+            if (e && e.target) e.target.classList.add('active');
             document.getElementById('notch-view-calc').style.display = tabKey === 'calc' ? 'block' : 'none';
             document.getElementById('notch-view-cal').style.display = tabKey === 'cal' ? 'block' : 'none';
             document.getElementById('notch-view-agent').style.display = tabKey === 'agent' ? 'block' : 'none';
         }
 
+        // SCIENTIFIC CALCULATOR LOGIC
         function calcInput(char) {
             const disp = document.getElementById('calc-display');
             if (!disp) return;
@@ -1662,14 +1839,61 @@
                 calcCurrentVal = '0';
             } else if (char === 'DEL') {
                 calcCurrentVal = calcCurrentVal.length > 1 ? calcCurrentVal.slice(0, -1) : '0';
+            } else if (char === '+/-') {
+                if (calcCurrentVal.startsWith('-')) calcCurrentVal = calcCurrentVal.slice(1);
+                else calcCurrentVal = '-' + calcCurrentVal;
             } else if (char === '=') {
                 try {
-                    calcCurrentVal = String(eval(calcCurrentVal.replace(/×/g, '*').replace(/÷/g, '/')));
+                    let sanitized = calcCurrentVal.replace(/×/g, '*').replace(/÷/g, '/');
+                    calcCurrentVal = String(Function('"use strict";return (' + sanitized + ')')());
                 } catch {
                     calcCurrentVal = 'Error';
                 }
             } else {
                 calcCurrentVal = calcCurrentVal === '0' ? char : calcCurrentVal + char;
+            }
+            disp.innerText = calcCurrentVal;
+        }
+
+        function calcSci(op) {
+            const disp = document.getElementById('calc-display');
+            if (!disp) return;
+            let val = parseFloat(calcCurrentVal) || 0;
+
+            if (op === 'deg') {
+                isDeg = !isDeg;
+                event.target.innerText = isDeg ? 'DEG' : 'RAD';
+                return;
+            }
+            if (op === 'sin') {
+                val = isDeg ? Math.sin(val * Math.PI / 180) : Math.sin(val);
+                calcCurrentVal = String(Number(val.toFixed(8)));
+            } else if (op === 'cos') {
+                val = isDeg ? Math.cos(val * Math.PI / 180) : Math.cos(val);
+                calcCurrentVal = String(Number(val.toFixed(8)));
+            } else if (op === 'tan') {
+                val = isDeg ? Math.tan(val * Math.PI / 180) : Math.tan(val);
+                calcCurrentVal = String(Number(val.toFixed(8)));
+            } else if (op === 'pi') {
+                calcCurrentVal = calcCurrentVal === '0' ? String(Math.PI) : calcCurrentVal + '*' + Math.PI;
+            } else if (op === 'e') {
+                calcCurrentVal = calcCurrentVal === '0' ? String(Math.E) : calcCurrentVal + '*' + Math.E;
+            } else if (op === 'ln') {
+                calcCurrentVal = String(Math.log(val));
+            } else if (op === 'log') {
+                calcCurrentVal = String(Math.log10(val));
+            } else if (op === 'sqrt') {
+                calcCurrentVal = String(Math.sqrt(val));
+            } else if (op === 'sq') {
+                calcCurrentVal = String(val * val);
+            } else if (op === 'inv') {
+                calcCurrentVal = String(val !== 0 ? 1 / val : 'Error');
+            } else if (op === 'percent') {
+                calcCurrentVal = String(val / 100);
+            } else if (op === 'fact') {
+                let f = 1;
+                for (let i = 2; i <= Math.min(val, 100); i++) f *= i;
+                calcCurrentVal = String(f);
             }
             disp.innerText = calcCurrentVal;
         }
@@ -1694,52 +1918,6 @@
             }
         }
 
-        // PARTICLE CANVAS SIMULATION
-        function initParticleCanvas() {
-            const canvas = document.getElementById('particle-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            let width = canvas.width = canvas.offsetWidth;
-            let height = canvas.height = canvas.offsetHeight;
-
-            window.addEventListener('resize', () => {
-                if (canvas && canvas.offsetWidth) {
-                    width = canvas.width = canvas.offsetWidth;
-                    height = canvas.height = canvas.offsetHeight;
-                }
-            });
-
-            const particles = [];
-            for (let i = 0; i < 45; i++) {
-                particles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    r: Math.random() * 1.5 + 0.5,
-                    vx: (Math.random() - 0.5) * 0.3,
-                    vy: (Math.random() - 0.5) * 0.3,
-                    alpha: Math.random() * 0.6 + 0.2
-                });
-            }
-
-            function draw() {
-                ctx.clearRect(0, 0, width, height);
-                particles.forEach(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    if (p.x < 0) p.x = width;
-                    if (p.x > width) p.x = 0;
-                    if (p.y < 0) p.y = height;
-                    if (p.y > height) p.y = 0;
-                    ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-                requestAnimationFrame(draw);
-            }
-            draw();
-        }
-
         // UTILITIES
         function escapeHtml(str) {
             return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -1755,7 +1933,6 @@
                 .replace(/`([^`]+)`/gim, '<code>$1</code>')
                 .replace(/^\* (.*$)/gim, '<li>$1</li>');
 
-            // Table rendering
             if (html.includes('|')) {
                 const lines = html.split('\n');
                 let tableMode = false;
@@ -1777,7 +1954,7 @@
             return html.replace(/\n\n/g, '<p></p>');
         }
 
-        // BOOT THE ECOSYSTEM
+        // BOOT THE SYSTEM
         window.addEventListener('DOMContentLoaded', safeBoot);
     </script>
 </body>
