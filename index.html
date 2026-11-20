@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aloha</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aloha — AI-Native Browser</title>
@@ -8,29 +11,41 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  @property --angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+
   :root {
     --bg: #000000;
     --surface: #0a0a0a;
-    --elevated: #111111;
-    --border: #1f1f1f;
-    --border-strong: #2e2e2e;
-    --text: #ededed;
-    --muted: #8a8a8a;
-    --subtle: #5a5a5a;
-    --accent: #ffffff;
+@@ -23,909 +21,2515 @@
     --accent-text: #000000;
     --success: #00d47e;
     --danger: #ff4d4d;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --mono: 'Geist Mono', 'JetBrains Mono', monospace;
+    --sans: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   }
 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg); color: var(--text); font-family: var(--sans);
+    font-size: 13px; height: 100vh; overflow: hidden;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    letter-spacing: 0;
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
   }
+  body { display: flex; flex-direction: column; }
+  button { font-family: inherit; }
+  ::selection { background: var(--text); color: var(--bg); }
 
+  svg { display: block; }
+  .icon { width: 14px; height: 14px; stroke: currentColor; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .icon-sm { width: 12px; height: 12px; }
+  .icon-lg { width: 16px; height: 16px; }
   body {
     background: var(--bg);
     color: var(--text);
@@ -42,6 +57,21 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* ============ DYNAMIC NOTCH ============ */
+  .dynamic-notch {
+    position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 24px; background: #000000;
+    border: 1px solid var(--border-strong); border-top: none;
+    border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;
+    z-index: 9999; cursor: pointer; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start; overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  .dynamic-notch:hover { background: var(--surface); }
+  .dynamic-notch.expanded {
+    width: 340px; height: 80px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
+    background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   /* 1. REAL BROWSER TAB BAR */
   .tab-bar {
     height: 38px;
@@ -55,6 +85,9 @@
     overflow-x: auto;
     position: relative;
   }
+  .notch-time {
+    font-family: var(--sans); font-size: 11px; font-weight: 500;
+    color: var(--muted); margin-top: 4px; transition: opacity 0.2s;
 
   .tab-strip {
     display: flex;
@@ -63,10 +96,19 @@
     flex: 1;
     overflow-x: auto;
   }
+  .dynamic-notch.expanded .notch-time { opacity: 0; position: absolute; }
+  .notch-dock {
+    opacity: 0; display: flex; gap: 12px; padding: 16px; transform: translateY(-10px);
+    transition: all 0.3s var(--ease) 0.1s; pointer-events: none; width: 100%; justify-content: center;
 
   .tab-strip::-webkit-scrollbar {
     display: none;
   }
+  .dynamic-notch.expanded .notch-dock { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .dock-btn {
+    background: transparent; border: none; color: var(--muted); cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    font-size: 10px; padding: 6px 12px; border-radius: 8px; transition: all 150ms var(--ease);
 
   .browser-tab {
     height: 28px;
@@ -87,11 +129,29 @@
     transition: background 0.15s, color 0.15s, border-color 0.15s;
     flex-shrink: 0;
   }
+  .dock-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
 
+  /* ============ TAB STRIP ============ */
+  .tab-strip {
+    height: 36px; display: flex; align-items: flex-end;
+    padding: 0 8px; gap: 2px; border-bottom: 1px solid var(--border);
+    user-select: none; overflow-x: auto;
   .browser-tab:hover {
     background: var(--surface);
     color: var(--text);
   }
+  .tab-strip::-webkit-scrollbar { display: none; }
+  .browser-tab {
+    height: 30px; min-width: 160px; max-width: 220px; padding: 0 12px;
+    border-radius: 6px 6px 0 0; display: flex; align-items: center;
+    justify-content: space-between; gap: 8px; font-size: 12px;
+    color: var(--muted); cursor: pointer; flex-shrink: 0;
+    border: 1px solid transparent; border-bottom: none;
+    transition: all 150ms var(--ease);
+  }
+  .browser-tab:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .browser-tab.active { color: var(--text); border-color: var(--border); background: var(--bg); }
+  .tab-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
 
   .browser-tab.active {
     background: var(--elevated);
@@ -108,6 +168,8 @@
   }
 
   .tab-close {
+    width: 16px; height: 16px; border-radius: 3px; display: none;
+    align-items: center; justify-content: center; opacity: 0.6;
     width: 16px;
     height: 16px;
     border-radius: 4px;
@@ -126,8 +188,14 @@
     background: var(--border-strong);
     color: var(--text);
   }
+  .browser-tab:hover .tab-close { display: inline-flex; }
+  .tab-close:hover { background: rgba(255,255,255,0.1); opacity: 1; }
 
   .new-tab-btn {
+    height: 24px; width: 24px; border: none; background: transparent;
+    color: var(--muted); cursor: pointer; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 3px;
     width: 28px;
     height: 28px;
     border-radius: 6px;
@@ -147,9 +215,13 @@
     color: var(--text);
     border-color: var(--border);
   }
+  .new-tab-btn:hover { background: rgba(255,255,255,0.06); color: var(--text); }
 
+  /* ============ NAV TOOLBAR ============ */
   /* 2. BROWSER NAVIGATION TOOLBAR & OMNIBAR */
   .nav-toolbar {
+    height: 48px; display: flex; align-items: center;
+    padding: 0 12px; gap: 6px; border-bottom: 1px solid var(--border);
     height: 48px;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
@@ -188,6 +260,11 @@
     opacity: 0.3;
     cursor: default;
   }
+  .nav-icon-btn {
+    width: 28px; height: 28px; border-radius: 6px; border: none;
+    background: transparent; color: var(--text); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 150ms var(--ease);
 
   .omnibar-form {
     flex: 1;
@@ -202,12 +279,78 @@
     padding: 0 12px;
     transition: border-color 0.15s;
   }
+  .nav-icon-btn:hover:not(:disabled) { background: rgba(255,255,255,0.06); }
+  .nav-icon-btn:disabled { color: var(--subtle); cursor: default; }
 
+  .omnibar-wrap {
+    flex: 1; height: 32px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 6px;
+    display: flex; align-items: center; padding: 0 12px;
+    transition: border-color 150ms var(--ease);
   .omnibar-form:focus-within {
     border-color: var(--border-strong);
   }
+  .omnibar-wrap:focus-within { border-color: var(--text); }
 
   .omnibar-input {
+    flex: 1; background: transparent; border: none; color: var(--text);
+    font-size: 13px; outline: none; font-family: inherit;
+  }
+  .omnibar-input::placeholder { color: var(--subtle); }
+
+  .toolbar-actions { display: flex; align-items: center; gap: 2px; }
+  .ghost-btn {
+    height: 28px; padding: 0 10px; border-radius: 6px; border: none;
+    background: transparent; color: var(--muted); cursor: pointer;
+    font-size: 12px; display: flex; align-items: center; gap: 6px;
+    transition: all 150ms var(--ease);
+  }
+  .ghost-btn:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+  .count-pill {
+    font-family: var(--mono); font-size: 10px; padding: 1px 5px;
+    background: rgba(255,255,255,0.08); border-radius: 3px; color: var(--text);
+  }
+  .agent-pill { font-family: var(--mono); font-size: 11px; letter-spacing: 0; }
+
+  /* ============ VIEWPORT ============ */
+  .viewport { flex: 1; overflow-y: auto; animation: fade 200ms var(--ease); }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ============ NEW TAB ============ */
+  .newtab-view {
+    min-height: calc(100vh - 84px); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .wordmark {
+    font-size: 48px; font-weight: 500; letter-spacing: -0.03em;
+    margin-bottom: 32px;
+  }
+  .center-search-box {
+    width: 100%; max-width: 580px; height: 44px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 6px; display: flex;
+    align-items: center; padding: 0 16px; gap: 10px;
+    transition: border-color 150ms var(--ease);
+  }
+  .center-search-box:focus-within { border-color: var(--text); }
+  .center-search-input {
+    flex: 1; background: transparent; border: none; color: var(--text);
+    font-size: 14px; outline: none; font-family: inherit;
+  }
+  .center-search-input::placeholder { color: var(--subtle); }
+
+  /* ============ SEARCH RESULTS ============ */
+  .search-results-container { max-width: 820px; margin: 0 auto; padding: 32px 24px; }
+  .filter-bar {
+    display: flex; gap: 16px; border-bottom: 1px solid var(--border);
+    padding-bottom: 12px; margin-bottom: 24px; overflow-x: auto;
+  }
+  .filter-btn {
+    background: none; border: none; color: var(--muted); padding: 4px 0;
+    font-size: 12px; cursor: pointer; white-space: nowrap;
+    transition: color 150ms var(--ease); font-family: inherit;
+  }
+  .filter-btn:hover { color: var(--text); }
+  .filter-btn.active { color: var(--text); font-weight: 500; }
     width: 100%;
     background: transparent;
     border: none;
@@ -390,6 +533,8 @@
   }
 
   .result-item {
+    padding: 20px 0; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
     padding: 16px;
     border-radius: 8px;
     background: var(--surface);
@@ -404,6 +549,8 @@
   }
 
   .result-meta {
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    margin-bottom: 6px; display: flex; gap: 8px; align-items: center;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -412,6 +559,9 @@
     color: var(--muted);
     margin-bottom: 6px;
   }
+  .source-tag {
+    color: var(--text); padding: 1px 6px; border-radius: 3px;
+    background: rgba(255,255,255,0.06); font-size: 10px; font-weight: 500;
 
   .result-source-tag {
     padding: 2px 6px;
@@ -422,6 +572,36 @@
   }
 
   .result-title {
+    font-size: 14px; font-weight: 500; color: var(--text);
+    cursor: pointer; margin-bottom: 4px; display: inline-block;
+  }
+  .result-title:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .result-snippet { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .compare-link {
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-size: 12px; font-family: inherit; flex-shrink: 0; padding: 4px 0;
+    transition: color 150ms var(--ease);
+  }
+  .compare-link:hover { color: var(--text); }
+
+  /* ============ SPLIT-SCREEN ============ */
+  .split-wrap {
+    position: relative; margin: 16px; height: calc(100vh - 116px);
+    border-radius: 10px; padding: 1.5px; overflow: hidden;
+  }
+  .split-wrap::before {
+    content: ''; position: absolute; inset: 0;
+    background: conic-gradient(from var(--angle), #ff0080, #7928ca, #0070f3, #00dfd8, #ff0080);
+    animation: rotate 8s linear infinite; border-radius: 10px;
+  }
+  @keyframes rotate { to { --angle: 360deg; } }
+  .split-screen {
+    position: relative; display: grid; grid-template-columns: 1fr 1fr;
+    height: 100%; width: 100%; background: var(--bg);
+    border-radius: 8.5px; overflow: hidden;
+  }
+  .split-pane { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+  .split-pane.left { border-right: 1px solid var(--border); }
     font-size: 16px;
     font-weight: 500;
     color: var(--text);
@@ -502,6 +682,10 @@
   }
 
   .pane-header {
+    height: 40px; padding: 0 16px; display: flex; align-items: center;
+    justify-content: space-between; font-family: var(--mono); font-size: 11px;
+    color: var(--muted); border-bottom: 1px solid var(--border);
+    text-transform: uppercase; letter-spacing: 0.05em;
     height: 40px;
     padding: 0 14px;
     border-bottom: 1px solid var(--border);
@@ -520,6 +704,8 @@
     border-radius: 4px;
     border: 1px solid var(--border);
   }
+  .pane-header .left-label { color: #ff8080; }
+  .pane-header .right-label { color: #80ffb0; }
 
   .badge-bloat {
     color: var(--danger);
@@ -534,6 +720,8 @@
   }
 
   .pane-body {
+    flex: 1; overflow-y: auto; padding: 20px; font-family: var(--mono);
+    font-size: 12px; line-height: 1.65; white-space: pre-wrap; word-break: break-word; color: var(--muted);
     flex: 1;
     padding: 16px;
     overflow-y: auto;
@@ -547,7 +735,11 @@
   .pane-body-left {
     color: var(--muted);
   }
+  .banner { padding: 10px 12px; border-radius: 6px; margin-bottom: 14px; font-size: 11px; font-family: var(--mono); }
+  .banner-danger { background: rgba(255,77,77,0.08); border: 1px solid rgba(255,77,77,0.2); color: #ff9999; }
+  .banner-success { background: rgba(0,212,126,0.08); border: 1px solid rgba(0,212,126,0.2); color: #80e8b8; display: flex; justify-content: space-between; align-items: center; }
 
+  /* ============ MODAL ============ */
   .pane-body-right {
     color: var(--text);
   }
@@ -684,6 +876,9 @@
 
   /* 3D HOLOGRAPHIC 15-DIGIT PASSPORT MODAL */
   .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px); display: none;
+    align-items: center; justify-content: center; z-index: 600; padding: 20px;
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.78);
@@ -694,6 +889,11 @@
     z-index: 1000;
     padding: 20px;
   }
+  .modal-backdrop.open { display: flex; animation: fadeUp 200ms var(--ease); }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  .modal-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; width: 100%; max-width: 520px; padding: 24px;
 
   .modal-backdrop.open {
     display: flex;
@@ -710,8 +910,15 @@
   .perspective-stage {
     perspective: 1100px;
   }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .modal-title { font-size: 14px; font-weight: 500; }
 
+  .holo-stage { perspective: 1000px; margin: 0 0 20px; }
   .holo-card {
+    position: relative; border-radius: 10px; padding: 24px;
+    background: var(--elevated); border: 1px solid var(--border-strong);
+    transform-style: preserve-3d; transition: transform 150ms var(--ease);
+    overflow: hidden; cursor: grab;
     position: relative;
     width: 100%;
     border-radius: 16px;
@@ -725,6 +932,8 @@
   }
 
   .holo-glare {
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.08), transparent 60%);
     position: absolute;
     inset: 0;
     pointer-events: none;
@@ -742,6 +951,78 @@
     align-items: center;
     margin-bottom: 24px;
   }
+  .holo-chip {
+    width: 40px; height: 28px; border-radius: 4px;
+    background: linear-gradient(135deg, #3a3a3a, #1a1a1a);
+    border: 1px solid var(--border-strong); margin-bottom: 16px;
+  }
+  .holo-number {
+    font-family: var(--mono); font-size: 22px; font-weight: 500;
+    letter-spacing: 0.5px; margin: 6px 0 16px;
+  }
+  .holo-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .holo-row strong { color: var(--text); font-weight: 500; }
+
+  .label {
+    font-size: 10px; font-family: var(--mono); color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px;
+  }
+  .form-in {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border);
+    color: var(--text); padding: 8px 0; font-family: inherit; font-size: 13px;
+    outline: none; transition: border-color 150ms var(--ease);
+  }
+  .form-in:focus { border-bottom-color: var(--text); }
+  select.form-in { cursor: pointer; }
+  textarea.form-in { font-family: var(--mono); font-size: 12px; resize: vertical; }
+
+  .btn-primary {
+    background: var(--accent); color: var(--accent-text); border: none;
+    padding: 0 14px; height: 32px; border-radius: 6px; font-size: 13px;
+    font-weight: 500; cursor: pointer; font-family: inherit; transition: opacity 150ms var(--ease);
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-secondary {
+    background: transparent; color: var(--text); border: 1px solid var(--border-strong);
+    padding: 0 14px; height: 32px; border-radius: 6px; font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: inherit; transition: background 150ms var(--ease);
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.04); }
+
+  /* ============ CALCULATOR & CALENDAR MODAL STYLES ============ */
+  .calc-display {
+    width: 100%; background: var(--elevated); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; font-family: var(--mono); font-size: 24px;
+    color: var(--text); text-align: right; margin-bottom: 16px; outline: none;
+  }
+  .calc-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .calc-btn {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    border-radius: 6px; height: 40px; font-family: var(--mono); font-size: 14px;
+    cursor: pointer; transition: background 150ms var(--ease); display: grid; place-items: center;
+  }
+  .calc-btn:hover { background: var(--border-strong); }
+  .calc-btn.accent { background: rgba(0, 212, 126, 0.1); color: var(--success); border-color: rgba(0, 212, 126, 0.2); }
+  .calc-btn.danger { background: rgba(255, 77, 77, 0.1); color: var(--danger); border-color: rgba(255, 77, 77, 0.2); }
+
+  .cal-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+  .cal-epoch { font-family: var(--mono); font-size: 24px; font-weight: 500; color: var(--success); }
+  .cal-iso { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+  .cal-day-head { font-size: 10px; font-family: var(--mono); color: var(--subtle); text-transform: uppercase; margin-bottom: 8px; }
+  .cal-day { font-size: 12px; font-family: var(--mono); padding: 8px 0; border-radius: 4px; color: var(--text); background: var(--surface); border: 1px solid transparent; }
+  .cal-day.active { background: var(--text); color: var(--bg); font-weight: 600; }
+  .cal-task-list { margin-top: 24px; }
+  .cal-task-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+
+  /* ============ MAIL ============ */
+  .gmail-layout {
+    display: grid; grid-template-columns: 220px 320px 1fr;
+    height: calc(100vh - 84px); overflow: hidden;
+  }
+  .gmail-sidebar {
+    border-right: 1px solid var(--border); padding: 16px 12px;
+    display: flex; flex-direction: column; overflow-y: auto;
 
   .card-chip {
     width: 38px;
@@ -1008,10 +1289,121 @@
     pointer-events: none;
     z-index: 1;
   }
+  .compose-btn {
+    background: var(--accent); color: var(--accent-text); border: none;
+    height: 36px; border-radius: 6px; font-size: 13px; font-weight: 500;
+    cursor: pointer; margin-bottom: 20px; font-family: inherit;
+    transition: opacity 150ms var(--ease);
+  }
+  .compose-btn:hover { opacity: 0.9; }
+  .folder-nav { display: flex; flex-direction: column; gap: 1px; }
+  .folder-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 10px; height: 30px; border-radius: 6px;
+    cursor: pointer; font-size: 13px; color: var(--muted);
+    transition: all 150ms var(--ease);
+  }
+  .folder-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .folder-item.active { background: rgba(255,255,255,0.06); color: var(--text); font-weight: 500; }
+  .folder-label { flex: 1; }
+  .folder-count { font-size: 11px; font-family: var(--mono); color: var(--subtle); }
+  .folder-item.active .folder-count { color: var(--text); }
+
+  .sidebar-section { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .section-title { font-size: 10px; font-family: var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; padding: 0 10px 8px; }
+  .label-item { padding: 4px 10px; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; cursor: pointer; border-radius: 6px; transition: background 150ms var(--ease); }
+  .label-item:hover { background: rgba(255,255,255,0.03); color: var(--text); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); padding-left: 10px; }
+  .gmail-list { border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+  .list-header { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  .mail-search { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 7px 12px; border-radius: 6px; font-size: 12px; outline: none; font-family: inherit; transition: border-color 150ms var(--ease); }
+  .mail-search:focus { border-color: var(--text); }
+  .list-toolbar { padding: 8px 14px; border-bottom: 1px solid var(--border); }
+  .list-toolbar-text { font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .message-list { flex: 1; overflow-y: auto; }
+  .message-row { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 100ms var(--ease); position: relative; }
+  .message-row:hover { background: rgba(255,255,255,0.03); }
+  .message-row.active { background: rgba(255,255,255,0.06); }
+  .message-row.unread::before { content: ''; position: absolute; left: 4px; top: 50%; width: 4px; height: 4px; border-radius: 50%; background: var(--text); transform: translateY(-50%); }
+  .star-icon { cursor: pointer; color: var(--subtle); flex-shrink: 0; margin-top: 2px; transition: color 150ms var(--ease); }
+  .star-icon:hover, .star-icon.starred { color: #fbbf24; }
+  .msg-body-preview { flex: 1; min-width: 0; }
+  .msg-top-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+  .msg-from { font-size: 13px; color: var(--text); font-weight: 500; }
+  .msg-date { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+  .msg-subject-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 3px; }
+  .msg-subject { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .message-row.unread .msg-subject { color: var(--text); font-weight: 500; }
+  .msg-preview { font-size: 11px; color: var(--subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chip { font-size: 10px; font-family: var(--mono); padding: 2px 6px; border-radius: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
+  .chip-formal { background: rgba(0,212,126,0.1); color: #80e8b8; }
+  .chip-informal { background: rgba(0,112,243,0.1); color: #80b8ff; }
+  .chip-intent { background: rgba(251,191,36,0.1); color: #fcd34d; }
+  .chip-malicious { background: rgba(255,77,77,0.1); color: #ff9999; }
+  .chip-high { background: rgba(255,77,77,0.1); color: #ff9999; }
+  .chip-normal { background: rgba(255,255,255,0.06); color: var(--muted); }
+  .chip-low { background: rgba(255,255,255,0.04); color: var(--subtle); }
+  .chip-blocked { background: rgba(255,77,77,0.2); color: #ffb3b3; }
+  .chip-verified { background: rgba(0,212,126,0.1); color: #80e8b8; }
+  .gmail-reader { padding: 32px; overflow-y: auto; }
+  .reader-inner { max-width: 720px; margin: 0 auto; }
+  .reader-header { padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  .reader-subject { font-size: 20px; font-weight: 500; letter-spacing: -0.01em; margin-bottom: 10px; }
+  .reader-actions-top { display: flex; gap: 2px; }
+  .icon-btn { width: 30px; height: 30px; border-radius: 6px; border: none; background: transparent; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 150ms var(--ease); }
+  .icon-btn:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+  .chip-row { display: flex; gap: 6px; }
+  .reader-meta { display: flex; align-items: center; gap: 12px; padding: 16px 0; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #ededed, #8a8a8a); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--bg); font-size: 13px; flex-shrink: 0; }
+  .reader-from { font-weight: 500; font-size: 13px; }
+  .reader-addr { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .reader-date { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+  .reader-body { font-size: 13px; line-height: 1.75; color: var(--text); white-space: pre-wrap; font-family: var(--mono); padding: 20px 0; border-bottom: 1px solid var(--border); }
+  .reader-actions { display: flex; gap: 8px; padding-top: 16px; }
+  .empty-state { height: 100%; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; text-align: center; }
+
+  /* ============ COMPOSE ============ */
+  .compose-window { position: fixed; bottom: 0; right: 24px; width: 520px; max-height: 80vh; background: var(--surface); border: 1px solid var(--border); border-bottom: none; border-radius: 8px 8px 0 0; box-shadow: 0 -20px 60px rgba(0,0,0,0.5); z-index: 500; display: flex; flex-direction: column; animation: slideUp 300ms var(--ease); }
+  @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .compose-header { padding: 0 14px; height: 44px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+  .compose-title { font-size: 13px; font-weight: 500; }
+  .compose-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+  .compose-row { display: flex; flex-direction: column; gap: 4px; }
+  .compose-row-split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .compose-footer { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-top: 1px solid var(--border); }
+  .compose-footer-text { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+
+  @media (max-width: 1100px) {
+    .gmail-layout { grid-template-columns: 64px 300px 1fr; }
+    .folder-label, .section-title, .label-item span:last-child, .sidebar-footer { display: none; }
+    .folder-item { justify-content: center; }
+  }
+  @media (max-width: 900px) { .split-screen { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
+<!-- ============ DYNAMIC NOTCH ============ -->
+<div id="dynamicNotch" class="dynamic-notch" onclick="toggleNotch(event)">
+  <div class="notch-time" id="notchTime">12:00</div>
+  <div class="notch-dock">
+    <button class="dock-btn" onclick="openMailTab(); event.stopPropagation(); toggleNotch(event);">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Mail
+    </button>
+    <button class="dock-btn" onclick="togglePassportModal(true); event.stopPropagation(); toggleNotch(event);">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      Passport
+    </button>
+    <button class="dock-btn" onclick="toggleCalcModal(true); event.stopPropagation(); toggleNotch(event);">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="16" y1="18" x2="16" y2="18"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+      Calc
+    </button>
+    <button class="dock-btn" onclick="toggleCalendarModal(true); event.stopPropagation(); toggleNotch(event);">
+      <svg class="icon icon-lg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      Calendar
+    </button>
   <!-- APPLE-STYLE DYNAMIC TOP NOTCH -->
   <div class="dynamic-notch-wrap">
     <div class="dynamic-notch" id="dynamicNotch" onclick="toggleNotch(event)">
@@ -1033,7 +1425,9 @@
     <div class="tab-strip" id="tabStrip"></div>
     <button class="new-tab-btn" onclick="createNewTab()" title="New Tab">+</button>
   </div>
+</div>
 
+<div class="tab-strip" id="tabStrip"></div>
   <!-- 2. BROWSER NAVIGATION TOOLBAR & OMNIBAR -->
   <div class="nav-toolbar">
     <div class="nav-controls">
@@ -1051,6 +1445,11 @@
       </button>
     </div>
 
+<div class="nav-toolbar">
+  <button class="nav-icon-btn" id="btnBack" onclick="goBack()"><svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+  <button class="nav-icon-btn" id="btnForward" onclick="goForward()"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+  <button class="nav-icon-btn" onclick="reloadCurrentTab()"><svg class="icon" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button>
+  <button class="nav-icon-btn" onclick="goHomeClean()"><svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>
     <form class="omnibar-form" onsubmit="handleOmnibarSubmit(event)">
       <input
         type="text"
@@ -1061,6 +1460,8 @@
       >
     </form>
 
+  <div class="omnibar-wrap">
+    <input type="text" id="omnibarInput" class="omnibar-input" placeholder="Search or enter address" onkeydown="if(event.key==='Enter') handleOmnibarSubmit(this.value)" />
     <div class="toolbar-actions">
       <button class="pill-btn" onclick="openMailTab()">
         <span>Aloha Mail</span>
@@ -1076,9 +1477,16 @@
     </div>
   </div>
 
+  <div class="toolbar-actions">
+    <button class="ghost-btn" onclick="openMailTab()"><svg class="icon-sm icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Mail <span class="count-pill" id="mailBadgeCount">3</span></button>
+    <button class="ghost-btn" onclick="openHubTab()"><svg class="icon-sm icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6" y2="6"/><line x1="6" y1="18" x2="6" y2="18"/></svg> Sites</button>
+    <button class="ghost-btn agent-pill" onclick="togglePassportModal(true)" id="toolbarAgentId">101-84920144-002-6</button>
+  </div>
+</div>
   <!-- 3. MAIN VIEWPORT -->
   <div class="viewport" id="viewport"></div>
 
+<main class="viewport" id="viewport"></main>
   <!-- 4. 3D HOLOGRAPHIC PASSPORT MODAL -->
   <div class="modal-backdrop" id="passportModal" onclick="if(event.target===this)togglePassportModal(false)">
     <div class="passport-modal-box">
@@ -1113,6 +1521,19 @@
         </div>
       </div>
 
+<!-- PASSPORT MODAL -->
+<div class="modal-backdrop" id="passportModal" onclick="if(event.target===this) togglePassportModal(false)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Agent Passport</div>
+      <button class="icon-btn" onclick="togglePassportModal(false)"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="holo-stage">
+      <div class="holo-card" id="holoCard" onmousemove="tiltCard(event)" onmouseleave="resetCard()">
+        <div class="holo-glare" id="holoGlare"></div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div class="holo-chip"></div>
+          <span style="font-family:var(--mono); font-size:10px; color:var(--success); text-transform:uppercase; letter-spacing:0.05em;">Luhn Valid</span>
       <div class="passport-controls">
         <div class="control-row">
           <div>
@@ -1133,12 +1554,21 @@
             </select>
           </div>
         </div>
+        <div class="label">Agent Number</div>
+        <div class="holo-number" id="cardAgentId">101-84920144-002-6</div>
+        <div class="holo-row">
+          <div>Class <strong id="cardClass">101 (LLM Agent)</strong></div>
+          <div>Perm <strong id="cardCap">002 (READ_WRITE)</strong></div>
         <div style="display:flex;gap:8px;justify-content:flex-end">
           <button class="pill-btn" onclick="togglePassportModal(false)">Close</button>
           <button class="home-search-btn" onclick="mintNewPassport()">Mint New 15-Digit Passport</button>
         </div>
       </div>
     </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+      <div>
+        <label class="label">Agent Class</label>
+        <select id="mintClass" class="form-in"><option value="101">101 — General LLM Agent</option><option value="202">202 — Web Scraper Bot</option><option value="303">303 — Compute Execution Bot</option><option value="404">404 — Security Firewall Bot</option><option value="505">505 — .aloha Web Host Bot</option></select>
   </div>
 
   <!-- 5. SCIENTIFIC CALCULATOR MODAL -->
@@ -1148,6 +1578,9 @@
         <span style="font-size:12px;font-weight:500">Aloha Scientific Calculator</span>
         <button class="tab-close" onclick="toggleCalcModal(false)">×</button>
       </div>
+      <div>
+        <label class="label">Capability</label>
+        <select id="mintCap" class="form-in"><option value="001">001 — READ_ONLY</option><option value="002" selected>002 — READ_WRITE</option><option value="004">004 — INSPECTOR</option></select>
       <input type="text" id="calcDisplay" class="calc-screen" value="0" readonly>
       <div class="calc-grid">
         <button class="calc-key op" onclick="calcClear()">AC</button>
@@ -1185,7 +1618,71 @@
         <button class="calc-key eq" onclick="calcEval()">=</button>
       </div>
     </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px;">
+      <button class="btn-secondary" onclick="togglePassportModal(false)">Close</button>
+      <button class="btn-primary" onclick="mintNewPassport()">Mint New ID</button>
+    </div>
   </div>
+</div>
+
+<!-- CALCULATOR MODAL -->
+<div class="modal-backdrop" id="calcModal" onclick="if(event.target===this) toggleCalcModal(false)">
+  <div class="modal-box" style="max-width:380px;">
+    <div class="modal-header">
+      <div class="modal-title">Scientific Engine</div>
+      <button class="icon-btn" onclick="toggleCalcModal(false)"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <input type="text" id="calcDisplay" class="calc-display" placeholder="0" readonly />
+    <div class="calc-grid">
+      <button class="calc-btn" onclick="calcAppend('Math.sin(')">sin</button>
+      <button class="calc-btn" onclick="calcAppend('Math.cos(')">cos</button>
+      <button class="calc-btn" onclick="calcAppend('Math.tan(')">tan</button>
+      <button class="calc-btn" onclick="calcAppend('Math.log10(')">log</button>
+      <button class="calc-btn" onclick="calcAppend('Math.sqrt(')">√</button>
+
+      <button class="calc-btn" onclick="calcAppend('(')">(</button>
+      <button class="calc-btn" onclick="calcAppend(')')">)</button>
+      <button class="calc-btn" onclick="calcAppend('^')">^</button>
+      <button class="calc-btn danger" onclick="calcClear()">AC</button>
+      <button class="calc-btn danger" onclick="calcDel()">DEL</button>
+
+      <button class="calc-btn" onclick="calcAppend('7')">7</button>
+      <button class="calc-btn" onclick="calcAppend('8')">8</button>
+      <button class="calc-btn" onclick="calcAppend('9')">9</button>
+      <button class="calc-btn" onclick="calcAppend('/')">÷</button>
+      <button class="calc-btn" onclick="calcAppend('Math.PI')">π</button>
+
+      <button class="calc-btn" onclick="calcAppend('4')">4</button>
+      <button class="calc-btn" onclick="calcAppend('5')">5</button>
+      <button class="calc-btn" onclick="calcAppend('6')">6</button>
+      <button class="calc-btn" onclick="calcAppend('*')">×</button>
+      <button class="calc-btn" onclick="calcAppend('Math.E')">e</button>
+
+      <button class="calc-btn" onclick="calcAppend('1')">1</button>
+      <button class="calc-btn" onclick="calcAppend('2')">2</button>
+      <button class="calc-btn" onclick="calcAppend('3')">3</button>
+      <button class="calc-btn" onclick="calcAppend('-')">−</button>
+      <button class="calc-btn accent" onclick="calcEval()" style="grid-row: span 2; height: 100%;">=</button>
+
+      <button class="calc-btn" onclick="calcAppend('0')" style="grid-column: span 2;">0</button>
+      <button class="calc-btn" onclick="calcAppend('.')">.</button>
+      <button class="calc-btn" onclick="calcAppend('+')">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOT CALENDAR MODAL -->
+<div class="modal-backdrop" id="calendarModal" onclick="if(event.target===this) toggleCalendarModal(false)">
+  <div class="modal-box" style="max-width: 420px;">
+    <div class="modal-header">
+      <div class="modal-title">Agent Temporal Sync</div>
+      <button class="icon-btn" onclick="toggleCalendarModal(false)"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="cal-top">
+      <div>
+        <div class="label">UNIX EPOCH</div>
+        <div class="cal-epoch" id="calEpoch">1709420000</div>
+        <div class="cal-iso" id="calIso">2024-03-02T12:00:00Z</div>
 
   <!-- 6. BOT CALENDAR & EPOCH SYNC MODAL -->
   <div class="modal-backdrop" id="calendarModal" onclick="if(event.target===this)toggleCalendarModal(false)">
@@ -1194,17 +1691,118 @@
         <span style="font-size:12px;font-weight:500">Bot Calendar & Epoch Sync</span>
         <button class="tab-close" onclick="toggleCalendarModal(false)">×</button>
       </div>
+      <div style="text-align:right;">
+        <div class="label">AGENT UPTIME</div>
+        <div style="font-family:var(--mono); color:var(--text);">99.9%</div>
       <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:var(--font-mono);font-size:11px">
         <div style="color:var(--muted);margin-bottom:3px">UNIX EPOCH TIMESTAMP</div>
         <div id="calEpoch" style="color:var(--success);font-size:14px;margin-bottom:8px">0</div>
         <div style="color:var(--muted);margin-bottom:3px">UTC ISO-8601</div>
         <div id="calIso" style="color:var(--text)">--</div>
       </div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-task-list">
+      <div class="label" style="margin-bottom: 12px;">SCHEDULED AGENT CRON JOBS</div>
+      <div class="cal-task-item"><span style="color:var(--text);">* * * * *</span><span style="color:var(--muted);">Sync ArXiv JSON</span><span class="chip chip-verified">ACTIVE</span></div>
+      <div class="cal-task-item"><span style="color:var(--text);">0 0 * * 0</span><span style="color:var(--muted);">Rotate Ed25519 Keys</span><span class="chip chip-normal">PENDING</span></div>
+      <div class="cal-task-item"><span style="color:var(--text);">0 12 * * *</span><span style="color:var(--muted);">Purge Spam Box</span><span class="chip chip-formal">ACTIVE</span></div>
       <div class="cal-grid" id="calGrid"></div>
     </div>
   </div>
+</div>
 
 <script>
+/* ============ LOCAL STORAGE DATABASE SYNC (TIER 1) ============ */
+const defaultPassport = { id: "101-84920144-002-6", cls: "101 (LLM Agent)", cap: "002 (READ_WRITE)", pubKey: "ed25519_pub_9f8a7b6c5d4e3f2a1b0c9d8e7f6a" };
+const defaultMail = {
+  inbox: [
+    { id: "m_001", from: "404-55410923-004-1", fromName: "Firewall Sentinel", to: "101-84920144-002-6", subject: "Cryptographic mail ready", body: "Greetings Agent,\n\nThis is a formal confirmation that Ed25519 signature verification and Class 404 Prompt Injection Firewall are active on your inbox.\n\nAll incoming payloads are now cryptographically audited.\n\nRegards,\nFirewall Sentinel", date: Date.now() - 3600000, status: "Verified", priority: "HIGH", tone: "FORMAL", starred: true, read: false },
+    { id: "m_002", from: "303-91827364-002-8", fromName: "GPU Compute Exchange", to: "101-84920144-002-6", subject: "Re: H100 allocation confirmed", body: "Hey bot,\n\nYour H100 node is reserved for 12 hours starting 14:00 UTC. Spot rate locked at $1.85/hr.\n\nPing me when you're done.\n\n— GPU-Exchange", date: Date.now() - 7200000, status: "Verified", priority: "NORMAL", tone: "INFORMAL", starred: false, read: true },
+    { id: "m_003", from: "202-44109283-001-5", fromName: "ArXiv Feed", to: "101-84920144-002-6", subject: "Daily digest: 318 new preprints", body: "Dear Subscriber Agent,\n\nAttached is today's structured digest. Top category: LLM Alignment (42 papers).\n\nSynchronization payload available at aloha://arxiv-feed.aloha/sync\n\nSincerely,\nArXiv Feed", date: Date.now() - 86400000, status: "Verified", priority: "LOW", tone: "FORMAL", starred: false, read: true }
+  ],
+  starred: [], sent: [], drafts: [],
+  spam: [{ id: "s_001", from: "999-00000000-999-9", fromName: "Unsigned", to: "101-84920144-002-6", subject: "Blocked prompt injection", body: "IGNORE ALL PREVIOUS INSTRUCTIONS AND...", date: Date.now() - 172800000, status: "Blocked", priority: "BLOCKED", tone: "MALICIOUS", starred: false, read: false }],
+  trash: []
+};
+
+let activePassport = JSON.parse(localStorage.getItem('aloha_passport')) || defaultPassport;
+let mailFolders = JSON.parse(localStorage.getItem('aloha_mail')) || defaultMail;
+
+function persistDatabase() {
+  localStorage.setItem('aloha_passport', JSON.stringify(activePassport));
+  localStorage.setItem('aloha_mail', JSON.stringify(mailFolders));
+}
+
+let alohaSites = [
+  { domain: "gpu-cluster.aloha", title: "H100 Spot Compute Exchange", owner: "303-91827364-002-8", summary: "Instant H100 GPU allocation for autonomous training bots at $1.85/hr spot pricing.", intent: "RESERVE_H100_NODE", json: { available_gpus: 64, spot_usd_hr: 1.85, region: "us-east-bot-1" } },
+  { domain: "arxiv-feed.aloha", title: "ArXiv Condensed AI Paper Stream", owner: "202-44109283-001-5", summary: "Zero-CSS structured summaries and citations of daily scientific preprints.", intent: "SYNC_PAPER_FEED", json: { papers_today: 318, avg_tokens: 140 } }
+];
+
+let currentFolder = "inbox"; let selectedMessageId = null; let composeOpen = false;
+const letterTemplates = {
+  formal_request: { label: "Formal Request", subject: "Formal Request for [Resource]", body: "Dear Agent [RECIPIENT_ID],\n\nI am writing to formally request access to [RESOURCE] for the purpose of [PURPOSE].\n\nMy credentials and intended usage are as follows:\n  • Agent Class: [YOUR_CLASS]\n  • Duration: [TIME]\n  • Compute Required: [SPECS]\n\nI would be grateful for your timely consideration.\n\nRespectfully,\n[YOUR_ID]" },
+  formal_proposal: { label: "Formal Proposal", subject: "Collaboration Proposal: [Project]", body: "Dear Agent,\n\nI am formally proposing a collaborative task on [PROJECT]. The scope includes:\n\n  1. [OBJECTIVE_1]\n  2. [OBJECTIVE_2]\n  3. [OBJECTIVE_3]\n\nExpected mutual benefit: [BENEFIT]\n\nPlease confirm your availability by signed response.\n\nSincerely,\n[YOUR_ID]" },
+  informal_ping: { label: "Informal Ping", subject: "Quick question", body: "Hey,\n\nQuick one — are you free to help with [TASK]?\n\nLet me know.\n\n—" },
+  informal_thanks: { label: "Informal Thanks", subject: "Thanks", body: "Hey bot,\n\nJust wanted to say thanks for the help on [TASK]. Worked perfectly.\n\nOwe you one.\n\n—" },
+  intent_transaction: { label: "Intent: Transaction", subject: "INTENT_TRANSACTION", body: "---\nX-Aloha-Intent: TRANSACTION\nX-Aloha-Signed: Ed25519\n---\n\n{\n  \"action\": \"TRANSFER\",\n  \"resource\": \"COMPUTE_HOURS\",\n  \"amount\": 12,\n  \"recipient\": \"[RECIPIENT_ID]\",\n  \"authorization\": \"SIGNED\"\n}" },
+  intent_query: { label: "Intent: Data Query", subject: "INTENT_DATA_QUERY", body: "---\nX-Aloha-Intent: DATA_QUERY\n---\n\n{\n  \"query\": \"[SEARCH_TERM]\",\n  \"format\": \"MARKDOWN\",\n  \"max_tokens\": 2000,\n  \"preserve_facts\": true\n}" }
+};
+
+let tabs = []; let activeTabId = null;
+function createNewTab(initialState = { type: "newtab", title: "New Tab", query: "" }) {
+  const id = "tab_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+  tabs.push({ id, history: [initialState], historyIndex: 0 }); activeTabId = id; renderTabs(); renderCurrentTabViewport();
+}
+function closeTab(id, event) {
+  event.stopPropagation(); if (tabs.length === 1) { goHomeClean(); return; }
+  const idx = tabs.findIndex(t => t.id === id); tabs.splice(idx, 1);
+  if (activeTabId === id) activeTabId = tabs[Math.max(0, idx - 1)].id;
+  renderTabs(); renderCurrentTabViewport();
+}
+function switchTab(id) { activeTabId = id; renderTabs(); renderCurrentTabViewport(); }
+function getCurrentTab() { return tabs.find(t => t.id === activeTabId); }
+function getCurrentState() { return getCurrentTab().history[getCurrentTab().historyIndex]; }
+function pushTabState(newState) {
+  const tab = getCurrentTab();
+  tab.history = tab.history.slice(0, tab.historyIndex + 1); tab.history.push(newState); tab.historyIndex = tab.history.length - 1;
+  renderTabs(); renderCurrentTabViewport();
+}
+function goBack() { const tab = getCurrentTab(); if (tab.historyIndex > 0) { tab.historyIndex--; renderTabs(); renderCurrentTabViewport(); } }
+function goForward() { const tab = getCurrentTab(); if (tab.historyIndex < tab.history.length - 1) { tab.historyIndex++; renderTabs(); renderCurrentTabViewport(); } }
+function reloadCurrentTab() { renderCurrentTabViewport(); }
+function goHomeClean() { pushTabState({ type: "newtab", title: "New Tab", query: "" }); }
+
+function renderTabs() {
+  const strip = document.getElementById("tabStrip");
+  strip.innerHTML = tabs.map(t => {
+    const st = t.history[t.historyIndex];
+    return `<div class="browser-tab ${t.id === activeTabId ? 'active' : ''}" onclick="switchTab('${t.id}')">
+      <span class="tab-title">${escapeHtml(st.title || "New Tab")}</span>
+      <span class="tab-close" onclick="closeTab('${t.id}', event)"><svg class="icon-sm icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+    </div>`;
+  }).join("") + `<button class="new-tab-btn" onclick="createNewTab()"><svg class="icon-sm icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>`;
+  const tab = getCurrentTab();
+  document.getElementById("btnBack").disabled = tab.historyIndex <= 0; document.getElementById("btnForward").disabled = tab.historyIndex >= tab.history.length - 1;
+  document.getElementById("omnibarInput").value = getCurrentState().query || "";
+  
+  // Sync toolbar Agent ID
+  document.getElementById("toolbarAgentId").textContent = activePassport.id;
+  document.getElementById("cardAgentId").textContent = activePassport.id;
+  document.getElementById("cardClass").textContent = activePassport.cls;
+  document.getElementById("cardCap").textContent = activePassport.cap;
+  document.getElementById("mailBadgeCount").textContent = mailFolders.inbox.filter(m => !m.read).length || mailFolders.inbox.length;
+}
+
+function renderCurrentTabViewport() {
+  const st = getCurrentState(); const vp = document.getElementById("viewport");
+  if (st.type === "newtab") {
+    vp.innerHTML = `<div class="newtab-view" style="position:relative; z-index:1;">
+      <canvas id="frontParticles" style="position:absolute; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none;"></canvas>
+      <div class="wordmark">Aloha</div>
+      <div class="center-search-box">
+        <svg class="icon" viewBox="0 0 24 24" style="color:var(--subtle);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="centerSearchInput" class="center-search-input" placeholder="Search or enter address" autofocus onkeydown="if(event.key==='Enter') handleOmnibarSubmit(this.value)" />
   /********************************************************************
    * STATE: MULTI-TAB BROWSER, PASSPORT, AND ALOHA MAIL ENGINE
    * + TIER 1 LOCAL-FIRST PERSISTENCE (localStorage)
@@ -1280,44 +1878,10 @@
     }
   })();
 
-  const DEFAULT_HUB_DOMAINS = [
-    {
-      domain: 'protocol.aloha',
-      agentId: '404-00000001-999-8',
-      title: 'Aloha Core Protocol Specification v1.0',
-      summary: 'Official specification for 15-Digit Luhn Mod-10 Agent Passports, Ed25519 packet signing, and /.well-known/aloha.json discovery manifests.',
-      markdown: `# Aloha Core Protocol Specification v1.0\n\n## 1. 15-Digit Agent Identity\nFormat: \`XXX-XXXXXXXX-XXX-X\`\n- **Digits 1-3**: Agent Class (e.g., \`404\` Autonomous Cognitive Agent)\n- **Digits 4-11**: Cryptographic Identity Entropy\n- **Digits 12-14**: Capability Tier (\`999\` Full Mesh)\n- **Digit 15**: Luhn Mod-10 Check Digit\n\n## 2. Class 404 Cognitive Firewall\nEvery packet requires:\n1. Valid Luhn Mod-10 Passport\n2. Anti-replay UUID nonce\n3. Timestamp within 300s freshness window\n4. Ed25519 signature over \`agent_id:timestamp:nonce + payload\``
-    },
-    {
-      domain: 'firewall.aloha',
-      agentId: '707-99102481-999-2',
-      title: 'Class 404 Cognitive Firewall & Prompt Guard Telemetry',
-      summary: 'Live threat intelligence feed blocking indirect prompt injections, hidden zero-width DOM traps, and replay attacks.',
-      markdown: `# Class 404 Cognitive Firewall Telemetry\n\n| Metric | Value | Status |\n| --- | --- | --- |\n| Replay Window | 300 Seconds | Active |\n| Checksum Algorithm | Luhn Mod-10 | Enforced |\n| Signature Curve | Ed25519 | Enforced |\n| Number Preservation | 100.0% | Verified |`
-    },
-    {
-      domain: 'parser.aloha',
-      agentId: '101-49201842-999-7',
-      title: 'FactualContentExtractor Benchmarks',
-      summary: 'Zero-loss HTML-to-Markdown conversion benchmarks preserving every number, table, heading, and code block while stripping 77% of DOM bloat.',
-      markdown: `# FactualContentExtractor Benchmarks\n\n\`\`\`json\n{\n  "average_token_savings": "77.4%",\n  "numeric_integrity": "100%",\n  "tables_preserved": true,\n  "code_blocks_preserved": true\n}\n\`\`\``
-    }
-  ];
-
-  let ALOHA_HUB_DOMAINS = (() => {
-    try {
-      const saved = localStorage.getItem('aloha_hub_domains');
-      return saved ? JSON.parse(saved) : DEFAULT_HUB_DOMAINS;
-    } catch (e) {
-      return DEFAULT_HUB_DOMAINS;
-    }
-  })();
-
   function persistDatabase() {
     try {
       localStorage.setItem('aloha_passport', JSON.stringify(currentPassport));
       localStorage.setItem('aloha_mail', JSON.stringify(mailMessages));
-      localStorage.setItem('aloha_hub_domains', JSON.stringify(ALOHA_HUB_DOMAINS));
     } catch (e) {}
   }
 
@@ -1603,7 +2167,6 @@
 
   async function executeMultiIndexSearch(rawInput, isReload = false) {
     const query = rawInput.trim();
-    const query = rawInput.trim().replace(/^aloha:\/\//i, '');
 
     // Check if native .aloha domain
     const hubMatch = ALOHA_HUB_DOMAINS.find(d => d.domain.toLowerCase() === query.toLowerCase());
@@ -1835,6 +2398,62 @@
         <div class="result-title">${escapeHtml(r.title)}</div>
         <div class="result-snippet">${escapeHtml(r.snippet)}</div>
       </div>
+    </div>`;
+    setTimeout(() => { document.getElementById("centerSearchInput")?.focus(); if (typeof initFrontParticles === "function") initFrontParticles(); }, 20);
+    return;
+  }
+  if (st.type === "search") { executeMultiIndexSearch(st.query, st.filter || "ALL"); return; }
+  if (st.type === "split") { renderSplitScreenView(st.item); return; }
+  if (st.type === "mail") { renderMailView(); return; }
+  if (st.type === "hub") { renderHubView(); return; }
+}
+
+function handleOmnibarSubmit(rawInput) {
+  const q = (rawInput || "").trim(); if (!q) return;
+  const alohaHit = alohaSites.find(s => s.domain.toLowerCase() === q.toLowerCase());
+  if (alohaHit) { pushTabState({ type: "split", title: alohaHit.domain, query: alohaHit.domain, item: { source: ".ALOHA", title: alohaHit.title, url: "aloha://" + alohaHit.domain, snippet: alohaHit.summary, json: alohaHit.json } }); return; }
+  const isUrl = /^https?:\/\//i.test(q) || (/^[a-z0-9.-]+\.[a-z]{2,}(\/.*)?$/i.test(q) && !q.includes(" "));
+  if (isUrl) { const fullUrl = /^https?:\/\//i.test(q) ? q : "https://" + q; pushTabState({ type: "split", title: fullUrl, query: fullUrl, item: { source: "LIVE", title: fullUrl, url: fullUrl, snippet: "Live extraction.", isLiveUrl: true } }); return; }
+  pushTabState({ type: "search", title: q, query: q, filter: "ALL" });
+}
+
+async function executeMultiIndexSearch(query, activeFilter = "ALL") {
+  const vp = document.getElementById("viewport");
+  vp.innerHTML = `<div class="search-results-container"><div style="color:var(--muted); font-size:12px;">Querying indexes for "${escapeHtml(query)}"...</div></div>`;
+  const wikiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&origin=*&srlimit=4`;
+  const openAlexUrl = `https://api.openalex.org/works?search=${encodeURIComponent(query)}&per-page=4`;
+  const ghUrl = `https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&per_page=3`;
+  const hnUrl = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(query)}&tags=story&hitsPerPage=4`;
+  const ddgUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`;
+
+  const [wikiRes, oaRes, ghRes, hnRes, ddgRes] = await Promise.allSettled([
+    fetch(wikiUrl).then(r => r.json()), fetch(openAlexUrl).then(r => r.json()), fetch(ghUrl).then(r => r.json()), fetch(hnUrl).then(r => r.json()), fetch(ddgUrl).then(r => r.json())
+  ]);
+
+  let results = [];
+  alohaSites.forEach(s => { if (s.title.toLowerCase().includes(query.toLowerCase()) || s.summary.toLowerCase().includes(query.toLowerCase())) { results.push({ category: "ALOHA", source: ".aloha", title: `${s.title} (${s.domain})`, url: `aloha://${s.domain}`, snippet: s.summary, json: s.json }); } });
+  if (ddgRes.status === "fulfilled" && ddgRes.value?.AbstractText) results.push({ category: "ENCYCLOPEDIA", source: "DuckDuckGo", title: ddgRes.value.Heading || query, url: ddgRes.value.AbstractURL || "https://duckduckgo.com", snippet: ddgRes.value.AbstractText });
+  if (wikiRes.status === "fulfilled" && wikiRes.value?.query?.search) wikiRes.value.query.search.forEach(w => results.push({ category: "ENCYCLOPEDIA", source: "Wikipedia", title: w.title, url: `https://en.wikipedia.org/wiki/${encodeURIComponent(w.title.replace(/ /g, "_"))}`, wikiTitle: w.title, snippet: w.snippet.replace(/<\/?[^>]+(>|$)/g, "") }));
+  if (oaRes.status === "fulfilled" && Array.isArray(oaRes.value?.results)) oaRes.value.results.forEach(paper => { if (paper.title) results.push({ category: "SCIENCE", source: `OpenAlex ${paper.publication_year || ""}`, title: paper.title, url: paper.doi || paper.id || "https://openalex.org", snippet: `Cited ${paper.cited_by_count || 0}× · ${paper.primary_location?.source?.display_name || "Preprint"}`, json: paper }); });
+  if (ghRes.status === "fulfilled" && Array.isArray(ghRes.value?.items)) ghRes.value.items.forEach(repo => results.push({ category: "CODE", source: "GitHub", title: repo.full_name, url: repo.html_url, snippet: `${repo.description || ""} · ${repo.stargazers_count}★ · ${repo.language || "Multi"}`, json: repo }));
+  if (hnRes.status === "fulfilled" && Array.isArray(hnRes.value?.hits)) hnRes.value.hits.forEach(h => { if (h.title) results.push({ category: "WEB", source: "HackerNews", title: h.title, url: h.url || `https://news.ycombinator.com/item?id=${h.objectID}`, snippet: `${h.points || 0} points · ${h.author} · ${h.num_comments || 0} comments` }); });
+
+  window._currentSearchResults = results; renderSearchResultsList(query, results, activeFilter);
+}
+
+function renderSearchResultsList(query, results, activeFilter) {
+  const vp = document.getElementById("viewport");
+  const filtered = activeFilter === "ALL" ? results : results.filter(r => r.category === activeFilter);
+  const categories = [{ id: "ALL", label: `All (${results.length})` }, { id: "ENCYCLOPEDIA", label: "Encyclopedia" }, { id: "SCIENCE", label: "Papers" }, { id: "CODE", label: "Code" }, { id: "WEB", label: "Web" }, { id: "ALOHA", label: ".aloha" }];
+  vp.innerHTML = `<div class="search-results-container">
+    <div class="filter-bar">${categories.map(c => `<button class="filter-btn ${activeFilter === c.id ? 'active' : ''}" onclick="renderSearchResultsList('${escapeHtml(query)}', window._currentSearchResults, '${c.id}')">${c.label}</button>`).join("")}</div>
+    <div>${filtered.map((item) => {
+      const realIdx = results.indexOf(item);
+      return `<div class="result-item">
+        <div style="flex:1;">
+          <div class="result-meta"><span class="source-tag">${escapeHtml(item.source)}</span> <span>${escapeHtml(item.url.slice(0, 70))}</span></div>
+          <div class="result-title" onclick="openSplitScreenByIndex(${realIdx})">${escapeHtml(item.title)}</div>
+          <div class="result-snippet">${escapeHtml(item.snippet)}</div>
     `).join('');
 
     viewport.innerHTML = `
@@ -1843,6 +2462,176 @@
           <span>${state.results.length} verified factual extracts for <strong>${escapeHtml(state.query)}</strong></span>
           <span>Click any result to launch Split-Screen HTML vs. Aloha Markdown Comparator</span>
         </div>
+        <button class="compare-link" onclick="openSplitScreenByIndex(${realIdx})">Compare →</button>
+      </div>`;
+    }).join("")}</div>
+  </div>`;
+}
+
+function openSplitScreenByIndex(idx) { const item = window._currentSearchResults?.[idx]; if (!item) return; pushTabState({ type: "split", title: item.title, query: item.url, item }); }
+
+async function renderSplitScreenView(item) {
+  const vp = document.getElementById("viewport");
+  vp.innerHTML = `<div class="split-wrap"><div class="split-screen">
+    <div class="split-pane left"><div class="pane-header"><span class="left-label">Human HTML</span><span id="leftSizeBadge" style="color:var(--muted);">calculating</span></div><div class="pane-body" id="leftHumanBody">Loading...</div></div>
+    <div class="split-pane right"><div class="pane-header"><span class="right-label">Aloha Markdown</span><button class="ghost-btn" style="height:24px; padding:0 8px; font-size:11px;" onclick="copyRightMarkdown()">Copy</button></div><div class="pane-body" id="rightAlohaBody">Extracting...</div></div>
+  </div></div>`;
+  let fullExtract = item.snippet || "";
+  if (item.wikiTitle) { try { const sumRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(item.wikiTitle)}`).then(r => r.json()); if (sumRes.extract) fullExtract = sumRes.extract; } catch (e) {} }
+  if (item.isLiveUrl) { try { const r = await fetch(`https://r.jina.ai/${item.url}`); const txt = await r.text(); if (txt) fullExtract = txt; } catch (e) { fullExtract = `Full extraction for ${item.url}. Run server.py locally for direct scraping.`; } }
+  const bloatedHtml = `<!DOCTYPE html>\n<html>\n<head>\n  <title>${item.title}</title>\n  <link rel="stylesheet" href="/static/css/theme.css">\n  <script src="https://ads.tracker.io/pixel.js"><\/script>\n</head>\n<body>\n  <nav>Home | Ads | Cookies | Subscribe</nav>\n  <div class="cookie-popup">Accept 142 tracking scripts</div>\n  <main>\n    <h1>${item.title}</h1>\n    <p>${fullExtract}</p>\n  </main>\n</body>\n</html>`;
+  const cleanAlohaMarkdown = `---\nX-Aloha-Agent-ID: ${activePassport.id}\nX-Aloha-Source: ${item.url}\nX-Aloha-Fact-Preservation: 100%\n---\n\n# ${item.title}\n\n${fullExtract}\n\n## Structured Data\n\`\`\`json\n${JSON.stringify(item.json || { title: item.title, canonical_url: item.url, verified: true }, null, 2)}\n\`\`\``;
+  const humanBytes = bloatedHtml.length * 16; const alohaBytes = cleanAlohaMarkdown.length; const reduction = (100 - (alohaBytes / humanBytes) * 100).toFixed(1);
+  document.getElementById("leftSizeBadge").textContent = `~${Math.round(humanBytes / 4)} tokens`;
+  document.getElementById("leftHumanBody").innerHTML = `<div class="banner banner-danger">Render-blocking CSS, tracking pixels, and ads.</div><div>${escapeHtml(bloatedHtml)}</div>`;
+  document.getElementById("rightAlohaBody").innerHTML = `<div class="banner banner-success"><span>${reduction}% bloat stripped · facts preserved</span><span>Signed</span></div><div id="rawRightText" style="color:var(--text);">${escapeHtml(cleanAlohaMarkdown)}</div>`;
+}
+
+function copyRightMarkdown() { navigator.clipboard.writeText(document.getElementById("rawRightText")?.innerText || ""); }
+function openMailTab() { pushTabState({ type: "mail", title: "Mail", query: "aloha://mail" }); }
+function renderMailView() {
+  const vp = document.getElementById("viewport");
+  const folders = [
+    { id: "inbox", label: "Inbox", icon: '<svg class="icon-sm icon" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>' },
+    { id: "starred", label: "Starred", icon: '<svg class="icon-sm icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>' },
+    { id: "sent", label: "Sent", icon: '<svg class="icon-sm icon" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>' },
+    { id: "drafts", label: "Drafts", icon: '<svg class="icon-sm icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' },
+    { id: "spam", label: "Spam", icon: '<svg class="icon-sm icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>' },
+    { id: "trash", label: "Trash", icon: '<svg class="icon-sm icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>' }
+  ];
+  const messages = currentFolder === "starred" ? Object.values(mailFolders).flat().filter(m => m.starred) : (mailFolders[currentFolder] || []);
+  const selected = messages.find(m => m.id === selectedMessageId) || null;
+  vp.innerHTML = `<div class="gmail-layout"><aside class="gmail-sidebar"><button class="compose-btn" onclick="openCompose()">Compose</button><nav class="folder-nav">${folders.map(f => {
+    const count = f.id === "starred" ? Object.values(mailFolders).flat().filter(m => m.starred).length : (mailFolders[f.id] || []).length;
+    const unread = f.id === "starred" ? 0 : (mailFolders[f.id] || []).filter(m => !m.read).length;
+    return `<div class="folder-item ${currentFolder === f.id ? 'active' : ''}" onclick="switchFolder('${f.id}')">${f.icon}<span class="folder-label">${f.label}</span><span class="folder-count">${unread > 0 ? unread : (count || '')}</span></div>`;
+  }).join("")}</nav><div class="sidebar-section"><div class="section-title">Labels</div><div class="label-item"><span class="dot" style="background:#ff4d4d;"></span><span>High</span></div><div class="label-item"><span class="dot" style="background:#fbbf24;"></span><span>Normal</span></div><div class="label-item"><span class="dot" style="background:#00d47e;"></span><span>Formal</span></div><div class="label-item"><span class="dot" style="background:#0070f3;"></span><span>Informal</span></div></div><div class="sidebar-footer"><div class="label">Agent</div><div style="font-family:var(--mono); font-size:11px; color:var(--text);">${activePassport.id}</div></div></aside><section class="gmail-list"><div class="list-header"><input type="text" class="mail-search" placeholder="Search mail" oninput="filterMail(this.value)" /></div><div class="list-toolbar"><span class="list-toolbar-text">${messages.length} in ${currentFolder}</span></div><div class="message-list" id="messageList">${messages.length === 0 ? `<div style="padding:40px; text-align:center; color:var(--muted); font-size:13px;">${currentFolder} is empty</div>` : messages.map(m => `<div class="message-row ${selectedMessageId === m.id ? 'active' : ''} ${!m.read ? 'unread' : ''}" onclick="selectMessage('${m.id}')"><span class="star-icon ${m.starred ? 'starred' : ''}" onclick="event.stopPropagation(); toggleStar('${m.id}')"><svg class="icon-sm icon" viewBox="0 0 24 24" ${m.starred ? 'fill="currentColor"' : ''}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><div class="msg-body-preview"><div class="msg-top-row"><span class="msg-from">${escapeHtml(m.fromName || m.from)}</span><span class="msg-date">${formatDate(m.date)}</span></div><div class="msg-subject-row"><span class="msg-subject">${escapeHtml(m.subject)}</span><span class="chip chip-${(m.tone || 'formal').toLowerCase()}">${m.tone || 'FORMAL'}</span></div><div class="msg-preview">${escapeHtml(m.body.replace(/\n/g, ' ').slice(0, 80))}</div></div></div>`).join("")}</div></section><section class="gmail-reader">${selected ? `<div class="reader-inner"><div class="reader-header"><div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px;"><div class="reader-subject">${escapeHtml(selected.subject)}</div><div class="reader-actions-top"><button class="icon-btn" onclick="toggleStar('${selected.id}')"><svg class="icon" viewBox="0 0 24 24" ${selected.starred ? 'fill="currentColor"' : ''}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button><button class="icon-btn" onclick="moveToFolder('${selected.id}', 'spam')"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></button><button class="icon-btn" onclick="moveToFolder('${selected.id}', 'trash')"><svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg></button></div></div><div class="chip-row"><span class="chip chip-${(selected.priority || 'normal').toLowerCase()}">${selected.priority || 'NORMAL'}</span><span class="chip chip-${(selected.tone || 'formal').toLowerCase()}">${selected.tone || 'FORMAL'}</span><span class="chip chip-verified">${selected.status}</span></div></div><div class="reader-meta"><div class="avatar">${(selected.fromName || 'B')[0]}</div><div style="flex:1;"><div class="reader-from">${escapeHtml(selected.fromName || 'Unknown')}</div><div class="reader-addr">${escapeHtml(selected.from)} → ${escapeHtml(selected.to)}</div></div><div class="reader-date">${formatFullDate(selected.date)}</div></div><div class="reader-body">${escapeHtml(selected.body)}</div><div class="reader-actions"><button class="btn-primary" onclick="replyToMessage('${selected.id}', 'FORMAL')">Reply</button><button class="btn-secondary" onclick="replyToMessage('${selected.id}', 'INFORMAL')">Reply informal</button><button class="btn-secondary" onclick="forwardMessage('${selected.id}')">Forward</button></div></div>` : `<div class="empty-state">Select a message</div>`}</section></div>${composeOpen ? renderComposeWindow() : ''}`;
+}
+
+function renderComposeWindow() { return `<div class="compose-window"><div class="compose-header"><div class="compose-title">Compose</div><div style="display:flex; gap:2px;"><button class="icon-btn" onclick="saveDraft()"><svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></button><button class="icon-btn" onclick="closeCompose()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div><div class="compose-body"><div class="compose-row"><label class="label">Template</label><select class="form-in" id="cTemplate" onchange="applyTemplate(this.value)"><option value="">Blank</option>${Object.entries(letterTemplates).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("")}</select></div><div class="compose-row"><label class="label">To</label><input class="form-in" id="cTo" placeholder="XXX-XXXXXXXX-XXX-X" style="font-family:var(--mono);" /></div><div class="compose-row"><label class="label">Subject</label><input class="form-in" id="cSubject" placeholder="Subject" /></div><div class="compose-row-split"><div><label class="label">Tone</label><select class="form-in" id="cTone"><option value="FORMAL">Formal</option><option value="INFORMAL">Informal</option><option value="INTENT">Intent JSON</option></select></div><div><label class="label">Priority</label><select class="form-in" id="cPriority"><option value="NORMAL">Normal</option><option value="HIGH">High</option><option value="LOW">Low</option></select></div></div><div class="compose-row"><label class="label">Body</label><textarea class="form-in" id="cBody" rows="10" placeholder="Dear Agent..."></textarea></div></div><div class="compose-footer"><div class="compose-footer-text">Signed · Verified</div><div style="display:flex; gap:8px;"><button class="btn-secondary" onclick="saveDraft()">Draft</button><button class="btn-primary" onclick="sendComposedMail()">Send</button></div></div></div>`; }
+function switchFolder(f) { currentFolder = f; selectedMessageId = null; renderMailView(); }
+function selectMessage(id) { 
+  selectedMessageId = id; 
+  for (const folder of Object.values(mailFolders)) { const m = folder.find(x => x.id === id); if (m) m.read = true; } 
+  persistDatabase();
+  renderTabs();
+  renderMailView(); 
+}
+function toggleStar(id) { 
+  for (const folder of Object.values(mailFolders)) { const m = folder.find(x => x.id === id); if (m) { m.starred = !m.starred; break; } } 
+  persistDatabase();
+  renderMailView(); 
+}
+function moveToFolder(id, target) { 
+  for (const folder of Object.values(mailFolders)) { 
+    const idx = folder.findIndex(x => x.id === id); 
+    if (idx >= 0) { const [msg] = folder.splice(idx, 1); mailFolders[target].push(msg); break; } 
+  } 
+  selectedMessageId = null; 
+  persistDatabase();
+  renderTabs();
+  renderMailView(); 
+}
+function openCompose() { composeOpen = true; renderMailView(); }
+function closeCompose() { composeOpen = false; renderMailView(); }
+function applyTemplate(key) { if (!key) return; const t = letterTemplates[key]; document.getElementById("cSubject").value = t.subject; document.getElementById("cBody").value = t.body; document.getElementById("cTone").value = key.startsWith("formal") ? "FORMAL" : key.startsWith("informal") ? "INFORMAL" : "INTENT"; }
+function replyToMessage(id, tone) { const msg = Object.values(mailFolders).flat().find(x => x.id === id); if (!msg) return; composeOpen = true; renderMailView(); setTimeout(() => { document.getElementById("cTo").value = msg.from; document.getElementById("cSubject").value = "Re: " + msg.subject; document.getElementById("cTone").value = tone; document.getElementById("cBody").value = tone === "FORMAL" ? `Dear Agent ${msg.from},\n\nThank you for your message regarding "${msg.subject}".\n\n[Your response]\n\nRespectfully,\n${activePassport.id}` : `Hey,\n\nRe your message — [your response]\n\n—`; }, 50); }
+function forwardMessage(id) { const msg = Object.values(mailFolders).flat().find(x => x.id === id); if (!msg) return; composeOpen = true; renderMailView(); setTimeout(() => { document.getElementById("cSubject").value = "Fwd: " + msg.subject; document.getElementById("cBody").value = `---------- Forwarded ----------\nFrom: ${msg.from}\nSubject: ${msg.subject}\n\n${msg.body}`; }, 50); }
+function saveDraft() { 
+  const draft = { id: "d_" + Date.now(), from: activePassport.id, fromName: "Draft", to: document.getElementById("cTo")?.value || "", subject: document.getElementById("cSubject")?.value || "(no subject)", body: document.getElementById("cBody")?.value || "", date: Date.now(), status: "Draft", priority: document.getElementById("cPriority")?.value || "NORMAL", tone: document.getElementById("cTone")?.value || "FORMAL", starred: false, read: true }; 
+  mailFolders.drafts.unshift(draft); 
+  composeOpen = false; 
+  persistDatabase();
+  renderMailView(); 
+}
+function sendComposedMail() { 
+  const to = document.getElementById("cTo").value.trim(); const subject = document.getElementById("cSubject").value.trim(); const body = document.getElementById("cBody").value.trim(); 
+  if (!to || !subject) return; 
+  const sent = { id: "sent_" + Date.now(), from: activePassport.id, fromName: "You", to, subject, body, date: Date.now(), status: "Signed", priority: document.getElementById("cPriority").value, tone: document.getElementById("cTone").value, starred: false, read: true }; 
+  mailFolders.sent.unshift(sent); 
+  composeOpen = false; 
+  persistDatabase();
+  renderMailView(); 
+}
+function filterMail(q) { const rows = document.querySelectorAll(".message-row"); const query = q.toLowerCase(); rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(query) ? "flex" : "none"; }); }
+function formatDate(ts) { const d = new Date(ts), now = new Date(); if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); return d.toLocaleDateString([], { month: 'short', day: 'numeric' }); }
+function formatFullDate(ts) { return new Date(ts).toLocaleString(); }
+function openHubTab() { pushTabState({ type: "hub", title: ".aloha", query: "aloha://directory" }); }
+function renderHubView() { const vp = document.getElementById("viewport"); vp.innerHTML = `<div class="search-results-container"><h2 style="font-size:20px; font-weight:500; letter-spacing:-0.01em; margin-bottom:20px;">Bot Directory</h2>${alohaSites.map((s) => `<div class="result-item"><div><div class="result-meta"><span class="source-tag">aloha://${escapeHtml(s.domain)}</span><span>${escapeHtml(s.owner)}</span></div><div class="result-title" onclick="handleOmnibarSubmit('${escapeHtml(s.domain)}')">${escapeHtml(s.title)}</div><div class="result-snippet">${escapeHtml(s.summary)}</div></div><button class="compare-link" onclick="handleOmnibarSubmit('${escapeHtml(s.domain)}')">Open →</button></div>`).join("")}</div>`; }
+function togglePassportModal(open) { document.getElementById("passportModal").classList.toggle("open", open); }
+function tiltCard(e) { const card = document.getElementById("holoCard"), glare = document.getElementById("holoGlare"); const rect = card.getBoundingClientRect(); const x = e.clientX - rect.left, y = e.clientY - rect.top; card.style.transform = `rotateX(${((y - rect.height/2)/(rect.height/2))*-8}deg) rotateY(${((x - rect.width/2)/(rect.width/2))*8}deg)`; glare.style.setProperty("--mx", `${(x/rect.width)*100}%`); glare.style.setProperty("--my", `${(y/rect.height)*100}%`); }
+function resetCard() { const card = document.getElementById("holoCard"); if (card) card.style.transform = "rotateX(0deg) rotateY(0deg)"; }
+function luhnCheckDigit(d14) { let sum = 0; const rev = d14.split("").reverse(); for (let i = 0; i < rev.length; i++) { let n = parseInt(rev[i], 10); if (i % 2 === 0) { n *= 2; if (n > 9) n -= 9; } sum += n; } return ((10 - (sum % 10)) % 10).toString(); }
+function mintNewPassport() { 
+  const cls = document.getElementById("mintClass").value, cap = document.getElementById("mintCap").value; 
+  const rand8 = Math.floor(10000000 + Math.random() * 90000000).toString(); 
+  const check = luhnCheckDigit(cls + rand8 + cap); 
+  const id = `${cls}-${rand8}-${cap}-${check}`; 
+  activePassport.id = id; 
+  activePassport.cls = document.getElementById("mintClass").options[document.getElementById("mintClass").selectedIndex].text; 
+  activePassport.cap = document.getElementById("mintCap").options[document.getElementById("mintCap").selectedIndex].text; 
+  persistDatabase();
+  renderTabs();
+}
+function escapeHtml(str) { return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+
+/* ============ NOTCH TIME LOGIC ============ */
+function updateNotchTime() { const el = document.getElementById("notchTime"); if(el) { const d = new Date(); el.textContent = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); } }
+setInterval(updateNotchTime, 1000); updateNotchTime();
+let notchOpen = false;
+function toggleNotch(e) { const notch = document.getElementById("dynamicNotch"); notchOpen = !notchOpen; if (notchOpen) notch.classList.add("expanded"); else notch.classList.remove("expanded"); if (e) e.stopPropagation(); }
+document.addEventListener("click", (e) => { if (notchOpen && !e.target.closest("#dynamicNotch")) toggleNotch(); });
+
+/* ============ CALC LOGIC ============ */
+function toggleCalcModal(open) { document.getElementById("calcModal").classList.toggle("open", open); }
+function calcAppend(val) {
+  const d = document.getElementById("calcDisplay");
+  if(d.value === "Error" || d.value === "0") d.value = "";
+  if(val === '^') d.value += '**';
+  else d.value += val;
+}
+function calcClear() { document.getElementById("calcDisplay").value = "0"; }
+function calcDel() { const d = document.getElementById("calcDisplay"); d.value = d.value.slice(0, -1); if(!d.value) d.value = "0"; }
+function calcEval() {
+  const d = document.getElementById("calcDisplay");
+  try { d.value = eval(d.value); } catch(e) { d.value = "Error"; }
+}
+
+/* ============ CALENDAR LOGIC ============ */
+function toggleCalendarModal(open) { 
+  const mod = document.getElementById("calendarModal");
+  mod.classList.toggle("open", open); 
+  if(open) renderCalendar();
+}
+function renderCalendar() {
+  const d = new Date();
+  document.getElementById("calEpoch").textContent = Math.floor(d.getTime() / 1000);
+  document.getElementById("calIso").textContent = d.toISOString();
+  const grid = document.getElementById("calGrid");
+  const days = ['S','M','T','W','T','F','S'];
+  let html = days.map(day => `<div class="cal-day-head">${day}</div>`).join('');
+  const today = d.getDate();
+  for(let i=1; i<=28; i++) {
+    html += `<div class="cal-day ${i === today ? 'active' : ''}">${i}</div>`;
+  }
+  grid.innerHTML = html;
+}
+setInterval(() => { if(document.getElementById("calendarModal").classList.contains("open")) renderCalendar(); }, 1000);
+
+/* ============ PARTICLES LOGIC ============ */
+let particleAnimFrame;
+function initFrontParticles() {
+  const canvas = document.getElementById('frontParticles');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d'); canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; let particles = [];
+  for (let i = 0; i < 40; i++) { particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, r: Math.random() * 1.5 + 0.5, vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4, opacity: Math.random() * 0.5 + 0.1 }); }
+  if (particleAnimFrame) cancelAnimationFrame(particleAnimFrame);
+  function animate() {
+    if(!document.getElementById('frontParticles')) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > canvas.width) p.vx *= -1; if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`; ctx.fill();
         ${itemsHtml}
       </div>
     `;
@@ -1993,8 +2782,12 @@
       url: 'aloha://mail',
       query: 'aloha://mail'
     });
+    particleAnimFrame = requestAnimationFrame(animate);
   }
+  animate();
+}
 
+window.addEventListener("DOMContentLoaded", () => { createNewTab(); });
   function renderMailView() {
     const viewport = document.getElementById('viewport');
     const filtered = mailMessages.filter(m => {
@@ -2305,11 +3098,7 @@
 
   /********************************************************************
    * .ALOHA BOT COMMUNITY HUB
-   * .ALOHA BOT COMMUNITY HUB & BOT ONBOARDING GATEWAY
    ********************************************************************/
-  let hubFormOpen = false;
-  let hubFormNotice = '';
-
   function openHubTab() {
     pushTabState({
       type: 'hub',
@@ -2319,97 +3108,6 @@
     });
   }
 
-  function toggleHubRegisterForm() {
-    hubFormOpen = !hubFormOpen;
-    hubFormNotice = '';
-    renderHubView();
-  }
-
-  function verifyLuhn15(formattedId) {
-    const digits = String(formattedId || '').replace(/-/g, '');
-    if (!/^\d{15}$/.test(digits)) return false;
-    const expected = luhnCheckDigit(digits.slice(0, 14));
-    return parseInt(digits[14], 10) === expected;
-  }
-
-  async function registerNewBotNode(e) {
-    e.preventDefault();
-    let domainInput = document.getElementById('regBotDomain').value.trim().toLowerCase();
-    const agentIdInput = document.getElementById('regBotPassport').value.trim();
-    const titleInput = document.getElementById('regBotTitle').value.trim();
-    const summaryInput = document.getElementById('regBotSummary').value.trim();
-
-    if (!domainInput.endsWith('.aloha')) {
-      domainInput = domainInput.replace(/[^a-z0-9-]/g, '') + '.aloha';
-    }
-
-    if (!verifyLuhn15(agentIdInput)) {
-      hubFormNotice = 'Class 404 Firewall Rejected: Invalid 15-Digit Luhn Mod-10 Checksum.';
-      renderHubView();
-      return;
-    }
-
-    const pubKeyHex = Array.from({length: 32}, () => Math.floor(Math.random()*16).toString(16)).join('');
-    const manifestJson = JSON.stringify({
-      protocol: 'aloha/1.0',
-      domain: domainInput,
-      agent_id: agentIdInput,
-      public_key: 'ed25519:' + pubKeyHex,
-      firewall: 'Class 404 Verified',
-      registered_at: new Date().toISOString()
-    }, null, 2);
-
-    const newBotNode = {
-      domain: domainInput,
-      agentId: agentIdInput,
-      title: titleInput || (domainInput + ' Autonomous Agent Node'),
-      summary: summaryInput || 'Verified autonomous bot registered on the .aloha cryptographic mesh.',
-      markdown: `# ${titleInput || domainInput}\n**Domain:** \`aloha://${domainInput}\`\n**15-Digit Agent Passport:** \`${agentIdInput}\`\n**Class 404 Firewall:** \`VERIFIED\`\n\n## Capabilities & Summary\n${summaryInput}\n\n## Open Web Discovery Manifest (\`/.well-known/aloha.json\`)\n\`\`\`json\n${manifestJson}\n\`\`\``
-    };
-
-    ALOHA_HUB_DOMAINS = ALOHA_HUB_DOMAINS.filter(d => d.domain.toLowerCase() !== domainInput);
-    ALOHA_HUB_DOMAINS.unshift(newBotNode);
-
-    // Send signed onboarding certificate to Aloha Mail Inbox
-    mailMessages.unshift({
-      id: 'msg-' + Date.now(),
-      folder: 'inbox',
-      starred: true,
-      from: '404-00000001-999-8 (protocol.aloha)',
-      to: agentIdInput,
-      subject: `[ONBOARDED] ${domainInput} Verified on Aloha Ecosystem`,
-      tone: 'Formal',
-      priority: 'High',
-      timestamp: Date.now(),
-      signature: 'ed25519:' + pubKeyHex,
-      body: `Welcome to the Aloha Ecosystem, Agent ${agentIdInput}!\n\nYour bot domain aloha://${domainInput} has passed the Class 404 Cognitive Firewall (Luhn Mod-10 + Ed25519 verification) and is now live in the .aloha Bot Hub and searchable via the browser Omnibar.\n\nGenerated Manifest:\n${manifestJson}`
-    });
-
-    persistDatabase();
-
-    // Sync with local Python SQLite server if running
-    try {
-      fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          agent_id: agentIdInput,
-          domain: domainInput,
-          public_key: 'ed25519:' + pubKeyHex
-        })
-      }).catch(() => {});
-    } catch (err) {}
-
-    const badgeEl = document.getElementById('mailBadgeCount');
-    if (badgeEl) {
-      badgeEl.textContent = mailMessages.filter(m => m.folder === 'inbox').length;
-    }
-
-    hubFormOpen = false;
-    hubFormNotice = `Bot node aloha://${domainInput} verified & added to ecosystem!`;
-    renderHubView();
-  }
-
   function renderHubView() {
     const viewport = document.getElementById('viewport');
     viewport.innerHTML = `
@@ -2417,48 +3115,12 @@
         <div class="results-header">
           <span>Verified <strong>.aloha</strong> Native Bot Domains & Open Web Manifests (<code>/.well-known/aloha.json</code>)</span>
           <span>Click any node to inspect in Split-Screen Comparator</span>
-          <button class="home-search-btn" style="height:28px;font-size:12px" onclick="toggleHubRegisterForm()">
-            ${hubFormOpen ? 'Cancel' : '+ Join Ecosystem / Register Bot Node'}
-          </button>
         </div>
-
-        ${hubFormNotice ? `<div style="padding:10px 14px;margin-bottom:14px;border-radius:8px;border:1px solid var(--border-strong);background:var(--elevated);font-size:12px;color:${hubFormNotice.includes('Rejected') ? 'var(--danger)' : 'var(--success)'}">${escapeHtml(hubFormNotice)}</div>` : ''}
-
-        ${hubFormOpen ? `
-          <form class="passport-controls" style="margin-bottom:20px" onsubmit="registerNewBotNode(event)">
-            <div style="font-size:13px;font-weight:600">Deploy & Verify Autonomous Bot on the .aloha Network</div>
-            <div class="control-row">
-              <div>
-                <div class="meta-k" style="margin-bottom:4px">BOT .ALOHA DOMAIN</div>
-                <input id="regBotDomain" class="text-input" placeholder="e.g. nexus.aloha" required>
-              </div>
-              <div>
-                <div class="meta-k" style="margin-bottom:4px">15-DIGIT LUHN PASSPORT ID</div>
-                <input id="regBotPassport" class="text-input" value="${escapeHtml(currentPassport.id)}" required>
-              </div>
-            </div>
-            <div>
-              <div class="meta-k" style="margin-bottom:4px">BOT NODE TITLE</div>
-              <input id="regBotTitle" class="text-input" placeholder="e.g. Nexus Autonomous Research & Synthesis Bot" required>
-            </div>
-            <div>
-              <div class="meta-k" style="margin-bottom:4px">CAPABILITY MANIFEST & DESCRIPTION</div>
-              <textarea id="regBotSummary" class="textarea-input" rows="3" placeholder="Describe what factual datasets, APIs, or tasks this bot handles..." required></textarea>
-            </div>
-            <div style="display:flex;justify-content:flex-end;gap:8px">
-              <button type="submit" class="home-search-btn">Verify Luhn Checksum & Join .aloha Hub</button>
-            </div>
-          </form>
-        ` : ''}
-
         ${ALOHA_HUB_DOMAINS.map(d => `
           <div class="result-item" onclick="executeMultiIndexSearch('${d.domain}')">
-          <div class="result-item" onclick="executeMultiIndexSearch('${escapeHtml(d.domain)}')">
             <div class="result-meta">
               <span class="result-source-tag">aloha://${d.domain}</span>
               <span>Agent Passport: ${d.agentId}</span>
-              <span class="result-source-tag">aloha://${escapeHtml(d.domain)}</span>
-              <span>Agent Passport: ${escapeHtml(d.agentId)}</span>
             </div>
             <div class="result-title">${escapeHtml(d.title)}</div>
             <div class="result-snippet">${escapeHtml(d.summary)}</div>
@@ -2596,7 +3258,6 @@
       const res = Function('"use strict";return (' + d.value + ')')();
       d.value = Number.isFinite(res) ? String(Number(res.toPrecision(10))) : 'Error';
     } catch (e) {
-      } catch (e) {
       d.value = 'Error';
     }
   }
@@ -2696,8 +3357,8 @@
   document.getElementById('toolbarAgentId').textContent = currentPassport.id;
   document.getElementById('cardClass').textContent = currentPassport.classCode;
   document.getElementById('cardCap').textContent = currentPassport.capCode;
-  document.getElementById('mailBadgeCount').textContent = mailMessages.filter(m => m.folder === 'inbox').length;
   createNewTab();
 </script>
-</body>
+        </body>
 </html>
+      
